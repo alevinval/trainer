@@ -75,10 +75,12 @@ func (a *Activity) Metadata() *Metadata {
 	return a.metadata
 }
 
+// DataPoints implements datapointProvider interface.
 func (a *Activity) DataPoints() DataPointList {
 	return a.datapoints
 }
 
+// DataPoints implements datapointProvider interface.
 func (al ActivityList) DataPoints() DataPointList {
 	list := DataPointList{}
 	for _, activity := range al {

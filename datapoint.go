@@ -41,7 +41,7 @@ func (dp *DataPoint) computePerf() {
 	dp.Perf = Performance(c * s / h)
 }
 
-// DataPoints implements datapointProvider interface
+// DataPoints implements datapointProvider interface.
 func (dp *DataPoint) DataPoints() DataPointList {
 	return DataPointList{dp}
 }
@@ -97,7 +97,7 @@ func (list DataPointList) weightedAverage(getter func(dp *DataPoint) float64) fl
 	return sum / float64(size)
 }
 
-// DataPoints implements datapointProvider interface
+// DataPoints implements datapointProvider interface.
 func (list DataPointList) DataPoints() DataPointList {
 	return list
 }

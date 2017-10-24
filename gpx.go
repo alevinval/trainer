@@ -50,6 +50,8 @@ func (g *gpx) Metadata() (meta *Metadata) {
 	return
 }
 
+// DataPoints implements datapointProvider interface.
+// It converts a list of gpxTrackPoints to a list of datapoints.
 func (g *gpx) DataPoints() (list DataPointList) {
 	list = make(DataPointList, len(g.TrackPoints))
 	for i, trackpoint := range g.TrackPoints {
