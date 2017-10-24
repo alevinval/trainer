@@ -46,7 +46,7 @@ func findActivities(lookupPath, prefix string) <-chan *trainer.Activity {
 			close(ch)
 		}
 		for fileName := range fileNames {
-			activity, err := trainer.Open(fileName)
+			activity, err := trainer.OpenFile(fileName)
 			if err != nil {
 				log.Printf("cannot open file %q: %s\n", fileName, err)
 				continue

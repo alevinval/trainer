@@ -2,18 +2,9 @@ package trainer
 
 import (
 	"io/ioutil"
-	"os"
 	"path"
 	"strings"
 )
-
-func getFileContent(name string) (b []byte, err error) {
-	f, err := os.Open(name)
-	if err != nil {
-		return nil, err
-	}
-	return ioutil.ReadAll(f)
-}
 
 func FindFiles(rootPath string) (fileNames chan string, err error) {
 	allPaths, err := ioutil.ReadDir(rootPath)
