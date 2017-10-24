@@ -19,8 +19,9 @@ type (
 	DataPointList []*DataPoint
 )
 
-func (dp *DataPoint) distanceTo(next *DataPoint) float64 {
-	return dp.Coords.distanceTo(next.Coords)
+// DistanceTo returns the distance in meters between two datapoints.
+func (dp *DataPoint) DistanceTo(next *DataPoint) float64 {
+	return dp.Coords.DistanceTo(next.Coords)
 }
 
 func (dp *DataPoint) secondsTo(next *DataPoint) float64 {
@@ -28,7 +29,7 @@ func (dp *DataPoint) secondsTo(next *DataPoint) float64 {
 }
 
 func (dp *DataPoint) computeSpeed(prevDataPoint *DataPoint) {
-	meters := prevDataPoint.distanceTo(dp)
+	meters := prevDataPoint.DistanceTo(dp)
 	seconds := prevDataPoint.secondsTo(dp)
 	dp.Speed = Speed(meters / seconds)
 }

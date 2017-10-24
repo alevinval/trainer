@@ -64,7 +64,8 @@ func (p Point) String() string {
 	return fmt.Sprintf("lat=%0.6f, lon=%0.6f", p.Lat, p.Lon)
 }
 
-func (p Point) distanceTo(other Point) float64 {
+// DistanceTo returns the distance in meters between two points.
+func (p Point) DistanceTo(other Point) float64 {
 	return approximateDistance(p.Lat, p.Lon, other.Lat, other.Lon)
 }
 

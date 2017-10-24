@@ -28,3 +28,10 @@ func TestUnitsToString(t *testing.T) {
 		assert.Equal(t, test.unit.String(), test.expected)
 	}
 }
+
+func TestPointDistance(t *testing.T) {
+	p1, p2 := Point{1, 1}, Point{2, 2}
+	assert.Equal(t, p1.DistanceTo(p1), float64(0))
+	assert.True(t, p1.DistanceTo(p2) > 0)
+	assert.True(t, p2.DistanceTo(p1) > 0)
+}

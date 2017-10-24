@@ -22,7 +22,7 @@ func FindClusters(activities ActivityList) (clusters ClusterList) {
 		coords := activity.DataPoints()[0].Coords
 		matchFound := false
 		for _, cluster := range clusters {
-			distance := coords.distanceTo(cluster.Coords)
+			distance := coords.DistanceTo(cluster.Coords)
 			if distance < clusteringDistance {
 				matchFound = true
 				cluster.Activities = append(cluster.Activities, activity)
