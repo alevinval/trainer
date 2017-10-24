@@ -5,10 +5,9 @@ import "time"
 type (
 	// Metadata is used to describe an Activity
 	Metadata struct {
-		Name         string
-		Time         time.Time
-		DataSource   DataSource
-		ResourceName string
+		Name       string
+		Time       time.Time
+		DataSource DataSource
 	}
 
 	// DataSource is used to describe the origin of a resource
