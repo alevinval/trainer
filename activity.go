@@ -62,8 +62,7 @@ func Open(fname string) (a *Activity, err error) {
 	datapoints.process()
 
 	metadata := provider.Metadata()
-	metadata.Source = FileSource
-	metadata.SourceName = fname
+	metadata.DataSource = newDataSource(FileDataSource, fname)
 
 	return &Activity{
 		Data:       data,

@@ -44,9 +44,8 @@ func newGpx(b []byte) (g *gpx, err error) {
 
 func (g *gpx) Metadata() (meta *Metadata) {
 	meta = &Metadata{
-		Name:   g.Name,
-		Time:   g.Time,
-		Source: FileSource,
+		Name: g.Name,
+		Time: g.Time,
 	}
 	return
 }
