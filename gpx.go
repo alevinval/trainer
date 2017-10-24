@@ -42,6 +42,9 @@ func newGpx(b []byte) (g *gpx, err error) {
 	return
 }
 
+// Metadata implements metadataProvider interface.
+// It creates a metadata object with known information of the gpx file:
+// The activity name and time it was carried on.
 func (g *gpx) Metadata() (meta *Metadata) {
 	meta = &Metadata{
 		Name: g.Name,

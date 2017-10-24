@@ -71,6 +71,7 @@ func Open(fname string) (a *Activity, err error) {
 	}, err
 }
 
+// Metadata implements metadataProvider interface.
 func (a *Activity) Metadata() *Metadata {
 	return a.metadata
 }
