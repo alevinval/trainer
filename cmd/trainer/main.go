@@ -18,7 +18,8 @@ type inputArgs struct {
 
 func parseArgs() (args *inputArgs, err error) {
 	flag.Usage = func() {
-		fmt.Print("./cli [path] [prefix]\n" +
+		fmt.Print("./trainer [command] [path] [prefix]\n" +
+			"command: cluster|performance.\n" +
 			"path: where to look for .gpx files.\n" +
 			"prefix: prefix that must be satisfied by the *.gpx files.\n")
 		flag.PrintDefaults()
