@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/alevinval/garmin-trainer"
+	"github.com/alevinval/trainer"
 )
 
 type inputArgs struct {
