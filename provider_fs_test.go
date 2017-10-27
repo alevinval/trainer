@@ -47,6 +47,8 @@ func TestOpenFile(t *testing.T) {
 			return
 		}
 		if err == nil {
+			metadata := activity.Metadata()
+			assert.Equal(t, newDataSource(FileDataSource, filePath), metadata.DataSource)
 			assert.Equal(t, test.dataPointsLen, len(activity.DataPoints()))
 		}
 	}
