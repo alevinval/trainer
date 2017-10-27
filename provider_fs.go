@@ -8,8 +8,7 @@ import (
 )
 
 const (
-	extGpx     fileExt = ".gpx"
-	extUnknown         = "unknown"
+	extGpx fileExt = ".gpx"
 )
 
 var (
@@ -23,9 +22,9 @@ type (
 
 // OpenFile reads a file content and returns an Activity.
 func OpenFile(fileName string) (a *Activity, err error) {
-	ext := getFileExt(fileName)
-	if ext == extUnknown {
-		return nil, ErrUnknownExtension
+	ext, err := getFileExt(fileName)
+	if err != nil {
+		return nil, err
 	}
 	data, err := getFileContents(fileName)
 	if err != nil {
@@ -46,21 +45,20 @@ func getFileContents(name string) (b []byte, err error) {
 	return ioutil.ReadAll(f)
 }
 
-func getFileExt(fileName string) fileExt {
+func getFileExt(fileName string) (ext fileExt, err error) {
 	switch fileExt(path.Ext(fileName)) {
 	case extGpx:
-		return extGpx
+		ext = extGpx
 	default:
-		return extUnknown
+		err = ErrUnknownExtension
 	}
+	return
 }
 
 func getFileActivityProvider(ext fileExt, data []byte) (p activityProvider, err error) {
 	switch ext {
 	case extGpx:
 		p, err = newGpx(data)
-	default:
-		p, err = nil, ErrUnknownExtension
 	}
 	return
 }
