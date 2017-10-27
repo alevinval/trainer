@@ -53,3 +53,8 @@ func TestOpenFile(t *testing.T) {
 		}
 	}
 }
+
+func TestOpenFileWithMissingFile(t *testing.T) {
+	_, err := OpenFile("some-path.gpx")
+	assert.NotNil(t, err)
+}
