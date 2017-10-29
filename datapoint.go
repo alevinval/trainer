@@ -6,6 +6,8 @@ import (
 )
 
 type (
+	// DataPoint holds all relevant data to describe the location and performance during
+	// an activity.
 	DataPoint struct {
 		Time   time.Time
 		Coords Point
@@ -16,7 +18,11 @@ type (
 
 		n int
 	}
+
+	// DataPointList is a list of DataPoint elements
 	DataPointList []*DataPoint
+
+	getterFunc func(dp *DataPoint) float64
 )
 
 // DistanceTo returns the distance in meters between two datapoints.
@@ -58,32 +64,25 @@ func (list DataPointList) process() {
 	}
 }
 
+// AvgSpeed returns the average speed of all datapoints in the list.
 func (list DataPointList) AvgSpeed() Speed {
-	var sum Speed
-	for _, dp := range list {
-		sum += dp.Speed
-	}
-	value := float64(sum) / float64(len(list))
-	return Speed(value)
+	avg := list.weightedAverage(getterSpeed)
+	return Speed(avg)
 }
 
+// AvgCad returns the average cadence of all datapoints in the list.
 func (list DataPointList) AvgCad() Cadence {
-	getter := func(dp *DataPoint) float64 {
-		return float64(dp.Cad)
-	}
-	avg := list.weightedAverage(getter)
+	avg := list.weightedAverage(getterCad)
 	return Cadence(avg)
 }
 
+// AvgPerf returns the average performance of all datapoints in the list.
 func (list DataPointList) AvgPerf() Performance {
-	getter := func(dp *DataPoint) float64 {
-		return float64(dp.Perf)
-	}
-	avg := list.weightedAverage(getter)
+	avg := list.weightedAverage(getterPerf)
 	return Performance(avg)
 }
 
-func (list DataPointList) weightedAverage(getter func(dp *DataPoint) float64) float64 {
+func (list DataPointList) weightedAverage(getter getterFunc) float64 {
 	var sum float64
 	var size int
 	for _, datapoint := range list {
@@ -107,4 +106,16 @@ func (list DataPointList) Histogram() *Histogram {
 	hist.Reset()
 	hist.Feed(list)
 	return hist
+}
+
+func getterCad(dp *DataPoint) float64 {
+	return float64(dp.Cad)
+}
+
+func getterSpeed(dp *DataPoint) float64 {
+	return float64(dp.Speed)
+}
+
+func getterPerf(dp *DataPoint) float64 {
+	return float64(dp.Perf)
 }
