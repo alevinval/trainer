@@ -25,6 +25,8 @@ type (
 	getterFunc func(dp *DataPoint) float64
 )
 
+var undefinedCoords = Point{}
+
 // DistanceTo returns the distance in meters between two datapoints.
 func (dp *DataPoint) DistanceTo(next *DataPoint) float64 {
 	return dp.Coords.DistanceTo(next.Coords)
@@ -35,6 +37,9 @@ func (dp *DataPoint) secondsTo(next *DataPoint) float64 {
 }
 
 func (dp *DataPoint) computeSpeed(prevDataPoint *DataPoint) {
+	if dp.Coords == undefinedCoords {
+		return
+	}
 	meters := prevDataPoint.DistanceTo(dp)
 	seconds := prevDataPoint.secondsTo(dp)
 	dp.Speed = Speed(meters / seconds)
@@ -96,11 +101,22 @@ func (list DataPointList) weightedAverage(getter getterFunc) float64 {
 	return sum / float64(size)
 }
 
+func (list DataPointList) filterBy(fn func(dp *DataPoint) bool) DataPointList {
+	filteredList := DataPointList{}
+	for _, dp := range list {
+		if fn(dp) {
+			filteredList = append(filteredList, dp)
+		}
+	}
+	return filteredList
+}
+
 // DataPoints implements datapointProvider interface.
 func (list DataPointList) DataPoints() DataPointList {
 	return list
 }
 
+// GetHistogram generates a histogram for the list of datapoints
 func (list DataPointList) GetHistogram() *Histogram {
 	hist := new(Histogram)
 	hist.Reset()
