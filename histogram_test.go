@@ -22,10 +22,7 @@ var input = DataPointList{
 }
 
 func TestHistogramFeed(t *testing.T) {
-	h := new(Histogram)
-	h.Reset()
-	h.Feed(input)
-
+	histogram := input.GetHistogram()
 	for _, test := range []struct {
 		hr    HeartRate
 		count int
@@ -34,7 +31,7 @@ func TestHistogramFeed(t *testing.T) {
 		{bpm150, 2},
 		{bpm180, 3},
 	} {
-		list := h.Data()[test.hr]
+		list := histogram.Data()[test.hr]
 		assert.Equal(t, test.count, len(list))
 	}
 }

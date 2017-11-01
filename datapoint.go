@@ -101,7 +101,7 @@ func (list DataPointList) DataPoints() DataPointList {
 	return list
 }
 
-func (list DataPointList) Histogram() *Histogram {
+func (list DataPointList) GetHistogram() *Histogram {
 	hist := new(Histogram)
 	hist.Reset()
 	hist.Feed(list)
