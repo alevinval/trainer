@@ -19,7 +19,7 @@ func (hist *Histogram) WriteTo(w io.Writer) {
 	for _, bpm := range sortedBpm {
 		dataPoints := hist.Data()[HeartRate(bpm)]
 		dp := flat.Data()[HeartRate(bpm)][0]
-		fmt.Fprintf(w, "%d,%d,%s,%0.2f,%0.0f,%0.2f\n", bpm, len(dataPoints), Pace(dp.Speed), dp.Speed, dp.Cad, dp.Perf)
+		fmt.Fprintf(w, "%d,%d,%0.2f,%0.2f,%0.0f,%0.2f\n", bpm, len(dataPoints), Pace(dp.Speed), dp.Speed, dp.Cad, dp.Perf)
 	}
 }
 
