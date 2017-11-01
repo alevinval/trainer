@@ -40,7 +40,7 @@ func parseArgs() (args *inputArgs, err error) {
 func findActivities(lookupPath, prefix string) <-chan *trainer.Activity {
 	ch := make(chan *trainer.Activity)
 	go func() {
-		fileNames, err := trainer.FindFilesWithPrefix(lookupPath, prefix)
+		fileNames, err := findFilesWithPrefix(lookupPath, prefix)
 		if err != nil {
 			log.Printf("cannot find activities in %s: %s\n", lookupPath, err)
 			close(ch)
