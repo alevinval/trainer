@@ -35,3 +35,10 @@ func TestHistogramFeed(t *testing.T) {
 		assert.Equal(t, test.count, len(list))
 	}
 }
+
+func TestHistogramFlatten(t *testing.T) {
+	histogram := input.GetHistogram()
+	assert.Equal(t, 3, len(histogram.Data()[bpm180]))
+	flat := histogram.Flatten()
+	assert.Equal(t, 1, len(flat.Data()[bpm180]))
+}
