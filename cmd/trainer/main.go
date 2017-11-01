@@ -60,26 +60,20 @@ func findActivities(lookupPath, prefix string) <-chan *trainer.Activity {
 
 func cluster(activities trainer.ActivityList) {
 	for _, cluster := range activities.GetClusters() {
-		hist := trainer.Histogram{}
-		hist.Reset()
-		hist.Feed(cluster.Activities)
+		hist := cluster.Activities.GetHistogram()
 		flat := hist.Flatten()
-		fmt.Printf("%s\nAvg.perf: %0.2f\n\n", cluster, flat.GetAvgPerf())
+		avgPerf := flat.GetAvgPerf()
+		fmt.Printf("%s\nAvg.perf: %0.2f\n\n", cluster, avgPerf)
 	}
 	return
 }
 
 func performance(activities trainer.ActivityList, print bool) {
-	globalHist := &trainer.Histogram{}
-	globalHist.Reset()
-	for _, activity := range activities {
-		fmt.Printf("Processing %q\n", activity.Metadata().Name)
-		globalHist.Feed(activity)
-	}
-	globalHist.PrintRaw()
+	histogram := activities.GetHistogram()
+	histogram.PrintRaw()
 	output, _ := os.Create("global.csv")
 	defer output.Close()
-	globalHist.WriteTo(output)
+	histogram.WriteTo(output)
 }
 
 func main() {
