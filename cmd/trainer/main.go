@@ -59,8 +59,7 @@ func findActivities(lookupPath, prefix string) <-chan *trainer.Activity {
 }
 
 func cluster(activities trainer.ActivityList) {
-	clusters := trainer.FindClusters(activities)
-	for _, cluster := range clusters {
+	for _, cluster := range activities.GetClusters() {
 		hist := trainer.Histogram{}
 		hist.Reset()
 		hist.Feed(cluster.Activities)

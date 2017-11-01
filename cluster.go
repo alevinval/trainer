@@ -16,7 +16,7 @@ type (
 	ClusterList []*Cluster
 )
 
-func FindClusters(activities ActivityList) (clusters ClusterList) {
+func findClusters(activities ActivityList) (clusters ClusterList) {
 	clusters = ClusterList{}
 	for _, activity := range activities {
 		coords := activity.DataPoints()[0].Coords
