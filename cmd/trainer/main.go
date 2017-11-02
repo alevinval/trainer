@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/alevinval/trainer"
 )
@@ -37,25 +38,33 @@ func parseArgs() (args *inputArgs, err error) {
 	return args, nil
 }
 
-func findActivities(lookupPath, prefix string) <-chan *trainer.Activity {
-	ch := make(chan *trainer.Activity)
-	go func() {
-		fileNames, err := findFilesWithPrefix(lookupPath, prefix)
-		if err != nil {
-			log.Printf("cannot find activities in %s: %s\n", lookupPath, err)
-			close(ch)
-		}
-		for fileName := range fileNames {
+func findActivities(lookupPath, prefix string) trainer.ActivityList {
+	activities := trainer.ActivityList{}
+
+	fileNames, err := findFilesWithPrefix(lookupPath, prefix)
+	if err != nil {
+		log.Printf("cannot find activities in %s: %s\n", lookupPath, err)
+		return activities
+	}
+
+	wg := new(sync.WaitGroup)
+	mux := new(sync.Mutex)
+	for fileName := range fileNames {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 			activity, err := trainer.OpenFile(fileName)
 			if err != nil {
 				log.Printf("cannot open file %q: %s\n", fileName, err)
-				continue
+				return
 			}
-			ch <- activity
-		}
-		close(ch)
-	}()
-	return ch
+			mux.Lock()
+			activities = append(activities, activity)
+			mux.Unlock()
+		}()
+	}
+	wg.Wait()
+	return activities
 }
 
 func cluster(activities trainer.ActivityList) {
@@ -81,10 +90,7 @@ func main() {
 	if err != nil {
 		return
 	}
-	activities := trainer.ActivityList{}
-	for activity := range findActivities(args.lookupPath, args.searchPrefix) {
-		activities = append(activities, activity)
-	}
+	activities := findActivities(args.lookupPath, args.searchPrefix)
 	switch args.cmd {
 	case "cluster":
 		cluster(activities)
