@@ -2,6 +2,7 @@ package trainer
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -40,6 +41,9 @@ func findClusters(activities ActivityList) (clusters ClusterList) {
 			clusters = append(clusters, newCluster)
 		}
 	}
+	sort.Slice(clusters, func(i, j int) bool {
+		return len(clusters[i].Activities) > len(clusters[j].Activities)
+	})
 	return clusters
 }
 
