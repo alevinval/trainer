@@ -19,6 +19,9 @@ type (
 func findClusters(activities ActivityList) (clusters ClusterList) {
 	clusters = ClusterList{}
 	for _, activity := range activities {
+		if len(activity.DataPoints()) == 0 {
+			continue
+		}
 		coords := activity.DataPoints()[0].Coords
 		matchFound := false
 		for _, cluster := range clusters {
