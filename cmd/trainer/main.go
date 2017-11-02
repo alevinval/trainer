@@ -51,7 +51,7 @@ func findActivities(lookupPath, prefix string) trainer.ActivityList {
 	mux := new(sync.Mutex)
 	for fileName := range fileNames {
 		wg.Add(1)
-		go func() {
+		go func(fileName string) {
 			defer wg.Done()
 			activity, err := trainer.OpenFile(fileName)
 			if err != nil {
@@ -61,7 +61,7 @@ func findActivities(lookupPath, prefix string) trainer.ActivityList {
 			mux.Lock()
 			activities = append(activities, activity)
 			mux.Unlock()
-		}()
+		}(fileName)
 	}
 	wg.Wait()
 	return activities
