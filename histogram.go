@@ -51,13 +51,6 @@ func (hist *Histogram) GetAvgPerf() Performance {
 	return list.AvgPerf()
 }
 
-func (hist *Histogram) countDataPoints() (count int) {
-	for _, list := range hist.data {
-		count += len(list)
-	}
-	return
-}
-
 func (hist *Histogram) maxCountHeartRate() (max int) {
 	for _, list := range hist.data {
 		if len(list) > max {
