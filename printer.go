@@ -17,10 +17,19 @@ func (hist *Histogram) WriteTo(w io.Writer) {
 	flat := hist.Flatten()
 	fmt.Fprint(w, "BPM,N,Pace,Speed,Cadence,Perf(steps/s * m/s / bps)\n")
 	for _, bpm := range sortedBpm {
-		dataPoints := hist.Data()[HeartRate(bpm)]
+		datapoints := hist.Data()[HeartRate(bpm)]
 		dp := flat.Data()[HeartRate(bpm)][0]
-		fmt.Fprintf(w, "%d,%d,%0.2f,%0.2f,%0.0f,%0.2f\n", bpm, len(dataPoints), Pace(dp.Speed), dp.Speed, dp.Cad, dp.Perf)
+		fmt.Fprintf(w, "%d,%d,%0.2f,%0.2f,%0.0f,%0.2f\n", bpm, len(datapoints), Pace(dp.Speed), dp.Speed, dp.Cad, dp.Perf)
 	}
+}
+
+func getMaxWidth(hist *Histogram) (max int) {
+	for _, datapoints := range hist.Data() {
+		if len(datapoints) > max {
+			max = len(datapoints)
+		}
+	}
+	return
 }
 
 func (hist *Histogram) PrintRaw() {
@@ -30,12 +39,14 @@ func (hist *Histogram) PrintRaw() {
 	}
 	sort.Ints(hrArr)
 
+	maxWidth := float64(getMaxWidth(hist))
+
 	flat := hist.Flatten()
 	for _, hrInt := range hrArr {
 		hr := HeartRate(hrInt)
-		dataPoints := hist.Data()[hr]
+		datapoints := hist.Data()[hr]
 		dots := ""
-		width := math.Floor(float64(len(dataPoints)) / float64(hist.maxCountHeartRate()) * 50)
+		width := math.Floor(float64(len(datapoints)) / maxWidth * 50)
 		for width > 0 {
 			width--
 			dots += "·"
