@@ -79,10 +79,10 @@ func cluster(activities trainer.ActivityList) {
 
 func performance(activities trainer.ActivityList, print bool) {
 	histogram := activities.GetHistogram()
-	histogram.PrintRaw()
+	trainer.PrintHistogram(histogram)
 	output, _ := os.Create("global.csv")
 	defer output.Close()
-	histogram.WriteTo(output)
+	trainer.WriteCsvTo(histogram, output)
 }
 
 func main() {
