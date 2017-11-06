@@ -61,5 +61,5 @@ func TestHistogramFlatten(t *testing.T) {
 		assert.Equal(t, flatDataPoint.AvgPerf(), matched.AvgPerf())
 	}
 
-	assert.Equal(t, flat.GetAvgPerf(), input.AvgPerf())
+	assert.Equal(t, flat.AvgPerf(), input.AvgPerf())
 }

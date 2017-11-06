@@ -71,7 +71,7 @@ func cluster(activities trainer.ActivityList) {
 	for _, cluster := range activities.GetClusters() {
 		hist := cluster.Activities.GetHistogram()
 		flat := hist.Flatten()
-		avgPerf := flat.GetAvgPerf()
+		avgPerf := flat.AvgPerf()
 		fmt.Printf("%s\nAvg.perf: %0.2f\n\n", cluster, avgPerf)
 	}
 	return

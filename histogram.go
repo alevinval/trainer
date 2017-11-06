@@ -48,7 +48,7 @@ func (hist *Histogram) Flatten() *Histogram {
 	return flat
 }
 
-func (hist *Histogram) GetAvgPerf() Performance {
+func (hist *Histogram) AvgPerf() Performance {
 	list := DataPointList{}
 	for _, datapoints := range hist.data {
 		list = append(list, datapoints...)
