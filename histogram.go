@@ -2,8 +2,9 @@ package trainer
 
 type (
 	Histogram struct {
-		Name string
-		data bpmToDataPoints
+		Name      string
+		data      bpmToDataPoints
+		flattened bool
 	}
 	bpmToDataPoints map[HeartRate]DataPointList
 )
@@ -28,6 +29,9 @@ func (hist *Histogram) Data() bpmToDataPoints {
 }
 
 func (hist *Histogram) Flatten() *Histogram {
+	if hist.flattened == true {
+		return hist
+	}
 	flat := new(Histogram)
 	flat.Reset()
 	for bpm, datapoints := range hist.data {
@@ -40,6 +44,7 @@ func (hist *Histogram) Flatten() *Histogram {
 		}
 		flat.Feed(avg)
 	}
+	flat.flattened = true
 	return flat
 }
 
