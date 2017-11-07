@@ -17,41 +17,40 @@ func getMaxWidth(hist *Histogram) (max int) {
 	return
 }
 
+func getSortedHeartRate(hist *Histogram) []HeartRate {
+	list := make([]HeartRate, 0, len(hist.Data()))
+	for hr := range hist.Data() {
+		list = append(list, hr)
+	}
+	sort.Slice(list, func(i, j int) bool {
+		return list[i] < list[j]
+	})
+	return list
+}
+
 func WriteCsvTo(hist *Histogram, w io.Writer) {
 	flat := hist.Flatten()
-
-	bpms := []int{}
-	for bpm := range flat.Data() {
-		bpms = append(bpms, int(bpm))
-	}
-	sort.Ints(bpms)
-
+	hrs := getSortedHeartRate(hist)
 	fmt.Fprint(w, "BPM,N,Pace,Speed,Cadence,Perf(steps/s * m/s / bps)\n")
-	for _, bpm := range bpms {
-		dp := flat.Data()[HeartRate(bpm)][0]
-		fmt.Fprintf(w, "%d,%d,%0.2f,%0.2f,%0.0f,%0.2f\n", bpm, dp.n, Pace(dp.Speed), dp.Speed, dp.Cad, dp.Perf)
+	for _, hr := range hrs {
+		dp := flat.Data()[hr][0]
+		fmt.Fprintf(w, "%d,%d,%0.2f,%0.2f,%0.0f,%0.2f\n", hr, dp.n, Pace(dp.Speed), dp.Speed, dp.Cad, dp.Perf)
 	}
 }
 
 func PrintHistogram(hist *Histogram) {
 	flat := hist.Flatten()
-	maxWidth := getMaxWidth(hist)
-
-	bpms := []int{}
-	for bpm := range flat.Data() {
-		bpms = append(bpms, int(bpm))
-	}
-	sort.Ints(bpms)
-
-	for _, bpm := range bpms {
-		hr := HeartRate(bpm)
-		datapoints := flat.Data()[hr]
-		width := int(math.Floor(float64(datapoints[0].n) / float64(maxWidth)))
-		if width == 0 {
+	maxWidth := getMaxWidth(flat)
+	hrs := getSortedHeartRate(hist)
+	maxDots := 50
+	for _, hr := range hrs {
+		datapoint := flat.Data()[hr][0]
+		numDots := int(math.Floor(50 * float64(datapoint.n) / float64(maxWidth)))
+		if numDots == 0 {
 			continue
 		}
-		dots := strings.Repeat(".", width)
-		bar := fmt.Sprintf("%s | p=%s | %s\n", hr, flat.Data()[hr][0].Perf, dots)
-		fmt.Print(bar)
+		dots := strings.Repeat(".", numDots)
+		dots += strings.Repeat(" ", maxDots-numDots)
+		fmt.Printf("%3d bpm | p=%0.2f | %s |\n", hr, datapoint.Perf, dots)
 	}
 }
