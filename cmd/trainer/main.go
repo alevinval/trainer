@@ -69,16 +69,14 @@ func findActivities(lookupPath, prefix string) trainer.ActivityList {
 
 func cluster(activities trainer.ActivityList) {
 	for _, cluster := range activities.GetClusters() {
-		hist := cluster.Activities.GetHistogram()
-		flat := hist.Flatten()
-		avgPerf := flat.AvgPerf()
+		avgPerf := cluster.Activities.DataPoints().AvgPerf()
 		fmt.Printf("%s\nAvg.perf: %0.2f\n\n", cluster, avgPerf)
 	}
 	return
 }
 
 func performance(activities trainer.ActivityList, print bool) {
-	histogram := activities.GetHistogram()
+	histogram := activities.DataPoints().GetHistogram()
 	trainer.PrintHistogram(histogram)
 	output, _ := os.Create("global.csv")
 	defer output.Close()

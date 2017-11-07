@@ -51,8 +51,3 @@ func (al ActivityList) DataPoints() DataPointList {
 func (al ActivityList) GetClusters() ClusterList {
 	return findClusters(al)
 }
-
-// GetHistogram generates a histogram for the list of activities
-func (al ActivityList) GetHistogram() *Histogram {
-	return al.DataPoints().GetHistogram()
-}

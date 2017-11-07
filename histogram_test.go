@@ -45,21 +45,16 @@ func TestHistogramFeed(t *testing.T) {
 
 func TestHistogramFlatten(t *testing.T) {
 	input := getTestInputDataPoints()
-	histogram := input.GetHistogram()
-	assert.Equal(t, 3, len(histogram.Data()[bpm180]))
+	hist := input.GetHistogram()
+	assert.Equal(t, 3, len(hist.Data()[bpm180]))
 
-	flat := histogram.Flatten()
-	assert.Equal(t, len(flat.Data()), 3)
-	assert.Equal(t, 1, len(flat.Data()[bpm180]))
-
+	flat := hist.Flatten()
 	for hr, flatDataPoint := range flat.Data() {
 		matched := input.filterBy(func(dp *DataPoint) bool {
 			return dp.Hr == hr
 		})
-		assert.Equal(t, flatDataPoint.AvgCad(), matched.AvgCad())
-		assert.Equal(t, flatDataPoint.AvgSpeed(), matched.AvgSpeed())
-		assert.Equal(t, flatDataPoint.AvgPerf(), matched.AvgPerf())
+		assert.Equal(t, flatDataPoint.Cad, matched.AvgCad())
+		assert.Equal(t, flatDataPoint.Speed, matched.AvgSpeed())
+		assert.Equal(t, flatDataPoint.Perf, matched.AvgPerf())
 	}
-
-	assert.Equal(t, flat.AvgPerf(), input.AvgPerf())
 }
