@@ -11,6 +11,7 @@ type (
 
 func (hist *Histogram) Reset() {
 	hist.data = make(bpmToDataPoints)
+	hist.flattened = false
 }
 
 func (hist *Histogram) Feed(provider dataPointProvider) {
