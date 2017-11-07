@@ -39,7 +39,7 @@ func (a *Activity) DataPoints() DataPointList {
 
 // DataPoints implements datapointProvider interface.
 func (al ActivityList) DataPoints() DataPointList {
-	list := DataPointList{}
+	list := make(DataPointList, 0, len(al))
 	for _, activity := range al {
 		list = append(list, activity.DataPoints()...)
 	}

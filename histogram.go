@@ -49,7 +49,7 @@ func (hist *Histogram) Flatten() *Histogram {
 }
 
 func (hist *Histogram) AvgPerf() Performance {
-	list := DataPointList{}
+	list := make(DataPointList, 0, len(hist.data))
 	for _, datapoints := range hist.data {
 		list = append(list, datapoints...)
 	}

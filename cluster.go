@@ -52,7 +52,7 @@ func (cluster *Cluster) String() string {
 }
 
 func (cl ClusterList) String() string {
-	lines := []string{}
+	lines := make([]string, 0, len(cl))
 	for _, cluster := range cl {
 		lines = append(lines, cluster.String())
 	}
