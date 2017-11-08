@@ -6,9 +6,6 @@ import (
 	"strings"
 )
 
-// Clustering distance in meters
-const clusteringDistance = 5000
-
 type (
 	Cluster struct {
 		Activities ActivityList
@@ -17,7 +14,7 @@ type (
 	ClusterList []*Cluster
 )
 
-func findClusters(activities ActivityList) (clusters ClusterList) {
+func findClusters(activities ActivityList, distance float64) (clusters ClusterList) {
 	clusters = ClusterList{}
 	for _, activity := range activities {
 		if len(activity.DataPoints()) == 0 {
@@ -27,7 +24,7 @@ func findClusters(activities ActivityList) (clusters ClusterList) {
 		matchFound := false
 		for _, cluster := range clusters {
 			distance := coords.DistanceTo(cluster.Coords)
-			if distance < clusteringDistance {
+			if distance < distance {
 				matchFound = true
 				cluster.Activities = append(cluster.Activities, activity)
 				break
