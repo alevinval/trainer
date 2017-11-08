@@ -1,11 +1,15 @@
 package trainer
 
-import "strings"
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
 
 // TagCloud represents a collection of strings that appear in
 // a group of activities.
 type TagCloud struct {
-	tags []string
+	tags map[string]int
 }
 
 var tagCloudSplitters = map[rune]struct{}{
@@ -20,9 +24,18 @@ var tagCloudSplitters = map[rune]struct{}{
 	'-':  {},
 }
 
-func tagCloudFromActivities(activities ActivityList) *TagCloud {
-	wordMap := make(map[string]struct{})
+var tagCloudIgnoredWords = map[string]struct{}{
+	"and": {},
+	"run": {},
+	"de":  {},
+}
 
+// TagCloudFromActivities returns the cloud of rellevant words represented within
+// list of activities.
+func TagCloudFromActivities(activities ActivityList) *TagCloud {
+	tagCloud := &TagCloud{
+		tags: make(map[string]int),
+	}
 	for _, activity := range activities {
 		metadata := activity.Metadata()
 		words := strings.FieldsFunc(metadata.Name, func(r rune) bool {
@@ -30,14 +43,33 @@ func tagCloudFromActivities(activities ActivityList) *TagCloud {
 			return ok
 		})
 		for _, word := range words {
-			wordMap[word] = struct{}{}
+			if len(word) == 1 {
+				continue
+			}
+			if _, ok := tagCloudIgnoredWords[word]; ok {
+				continue
+			}
+			tagCloud.tags[word]++
 		}
 	}
+	return tagCloud
+}
 
-	words := make([]string, 0, len(wordMap))
-	for word := range wordMap {
+func (tg *TagCloud) asList() []string {
+	words := make([]string, 0, len(tg.tags))
+	for word := range tg.tags {
 		words = append(words, word)
 	}
+	sort.Slice(words, func(i, j int) bool {
+		return tg.tags[words[i]] > tg.tags[words[j]]
+	})
+	return words
+}
 
-	return &TagCloud{tags: words}
+func (tg *TagCloud) String() string {
+	list := ""
+	for _, word := range tg.asList() {
+		list += fmt.Sprintf("%s[%d] ", word, tg.tags[word])
+	}
+	return list
 }

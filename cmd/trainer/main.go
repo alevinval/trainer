@@ -69,8 +69,9 @@ func findActivities(lookupPath, prefix string) trainer.ActivityList {
 
 func cluster(activities trainer.ActivityList) {
 	for _, cluster := range activities.GetClusters() {
+		tagCloud := trainer.TagCloudFromActivities(cluster.Activities)
 		avgPerf := cluster.Activities.DataPoints().AvgPerf()
-		fmt.Printf("%s\nAvg.perf: %0.2f\n\n", cluster, avgPerf)
+		fmt.Printf("%s\n%s\nAvg.perf: %0.2f\n\n", cluster, tagCloud, avgPerf)
 	}
 	return
 }
