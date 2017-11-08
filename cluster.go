@@ -12,6 +12,7 @@ type (
 	Cluster struct {
 		Activities ActivityList
 		Coords     Point
+		TagCloud   *TagCloud
 	}
 
 	// ClusterList is a list of clusters.
@@ -44,11 +45,16 @@ func findClusters(activities ActivityList, distance float64) (clusters ClusterLi
 	sort.Slice(clusters, func(i, j int) bool {
 		return len(clusters[i].Activities) > len(clusters[j].Activities)
 	})
+
+	for _, cluster := range clusters {
+		cluster.TagCloud = tagCloudFromActivities(cluster.Activities)
+	}
 	return clusters
 }
 
 func (cluster *Cluster) String() string {
-	return fmt.Sprintf("%s, n=%d", cluster.Coords, len(cluster.Activities))
+	tags := strings.Join(cluster.TagCloud.tags, " ")
+	return fmt.Sprintf("%s, n=%d, tags: %s", cluster.Coords, len(cluster.Activities), tags)
 }
 
 func (cl ClusterList) String() string {
