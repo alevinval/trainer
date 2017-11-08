@@ -7,10 +7,14 @@ import (
 )
 
 type (
+	// Cluster contains a list of activities that happened close to a center of
+	// coordinates.
 	Cluster struct {
 		Activities ActivityList
 		Coords     Point
 	}
+
+	// ClusterList is a list of clusters.
 	ClusterList []*Cluster
 )
 
@@ -21,10 +25,9 @@ func findClusters(activities ActivityList, distance float64) (clusters ClusterLi
 			continue
 		}
 		coords := activity.DataPoints()[0].Coords
-		matchFound := false
+		var matchFound bool
 		for _, cluster := range clusters {
-			distance := coords.DistanceTo(cluster.Coords)
-			if distance < distance {
+			if coords.DistanceTo(cluster.Coords) < distance {
 				matchFound = true
 				cluster.Activities = append(cluster.Activities, activity)
 				break
