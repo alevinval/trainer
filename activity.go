@@ -45,9 +45,3 @@ func (al ActivityList) DataPoints() DataPointList {
 	}
 	return list
 }
-
-// GetClusters traverses the activity list to find clusters of activities
-// by coordinates.
-func (al ActivityList) GetClusters() ClusterList {
-	return findClusters(al, 5000.0)
-}

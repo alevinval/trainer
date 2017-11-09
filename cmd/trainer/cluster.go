@@ -24,7 +24,7 @@ func init() {
 
 func doClusterCommand(path string) error {
 	activities := findActivities(path, prefix)
-	for _, cluster := range activities.GetClusters() {
+	for _, cluster := range trainer.GetClusters(activities, trainer.DistanceCriteria(5000.0)) {
 		tagCloud := trainer.TagCloudFromActivities(cluster.Activities)
 		avgPerf := cluster.Activities.DataPoints().AvgPerf()
 		fmt.Printf("%s\n%s\nAvg.perf: %0.2f\n\n", cluster, tagCloud, avgPerf)
