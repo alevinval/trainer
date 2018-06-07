@@ -1,10 +1,13 @@
 package trainer
 
 import (
+	"compress/gzip"
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 )
 
 const (
@@ -22,11 +25,11 @@ type (
 
 // OpenFile reads a file content and returns an Activity.
 func OpenFile(fileName string) (a *Activity, err error) {
-	ext, err := getFileExt(fileName)
+	ext, isGzip, err := getFileExt(fileName)
 	if err != nil {
 		return nil, err
 	}
-	data, err := getFileContents(fileName)
+	data, err := getFileContents(fileName, isGzip)
 	if err != nil {
 		return nil, err
 	}
@@ -37,16 +40,29 @@ func OpenFile(fileName string) (a *Activity, err error) {
 	return buildActivityFromFile(fileName, provider, data), nil
 }
 
-func getFileContents(name string) (b []byte, err error) {
-	f, err := os.Open(name)
+func getFileContents(name string, isGzip bool) (b []byte, err error) {
+	var src io.Reader
+
+	src, err = os.Open(name)
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(f)
+	if isGzip {
+		src, err = gzip.NewReader(src)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ioutil.ReadAll(src)
 }
 
-func getFileExt(fileName string) (ext fileExt, err error) {
-	switch fileExt(path.Ext(fileName)) {
+func getFileExt(fileName string) (ext fileExt, isGzip bool, err error) {
+	extStr := path.Ext(fileName)
+	if extStr == ".gz" {
+		extStr = path.Ext(strings.TrimSuffix(fileName, ".gz"))
+		isGzip = true
+	}
+	switch fileExt(extStr) {
 	case extGpx:
 		ext = extGpx
 	default:

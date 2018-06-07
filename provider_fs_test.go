@@ -1,6 +1,8 @@
 package trainer
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -17,6 +19,17 @@ func createTmpFile(t *testing.T, path string, data []byte) {
 	if err != nil {
 		t.Fatalf("error writing file: %s", err)
 	}
+}
+
+func createGzipTmpFile(t *testing.T, path string, data []byte) {
+	var b bytes.Buffer
+	w := gzip.NewWriter(&b)
+	_, err := w.Write(data)
+	if err != nil {
+		t.Fatalf("error writing gzip file: %s", err)
+	}
+	w.Close()
+	createTmpFile(t, path, b.Bytes())
 }
 
 func createGpxActivityAsText() string {
@@ -78,9 +91,14 @@ func TestOpenFile(t *testing.T) {
 		{"right-extension-valid-data.gpx", "<xml></xml>", nil, 0},
 
 		{"right-file-1.gpx", createGpxActivityAsText(), nil, 3},
+		{"right-file-2-compressed.gpx.gz", createGpxActivityAsText(), nil, 3},
 	} {
 		filePath := path.Join(tmpDir, test.fileName)
-		createTmpFile(t, filePath, []byte(test.data))
+		if path.Ext(filePath) == ".gz" {
+			createGzipTmpFile(t, filePath, []byte(test.data))
+		} else {
+			createTmpFile(t, filePath, []byte(test.data))
+		}
 
 		activity, err := OpenFile(filePath)
 		if !assert.Equal(t, test.err, err) {
