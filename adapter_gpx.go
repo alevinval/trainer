@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	gpx struct {
+	gpxAdapter struct {
 		Time        time.Time       `xml:"metadata>time"`
 		Name        string          `xml:"trk>name"`
 		TrackPoints []gpxTrackPoint `xml:"trk>trkseg>trkpt"`
@@ -36,8 +36,8 @@ func (tp *gpxTrackPoint) toDataPoint() (dp *DataPoint) {
 	return dp
 }
 
-func newGpx(b []byte) (g *gpx, err error) {
-	g = new(gpx)
+func newGpxAdapter(b []byte) (g *gpxAdapter, err error) {
+	g = new(gpxAdapter)
 	err = xml.Unmarshal(b, g)
 	return
 }
@@ -45,7 +45,7 @@ func newGpx(b []byte) (g *gpx, err error) {
 // Metadata implements metadataProvider interface.
 // It creates a metadata object with known information of the gpx file:
 // The activity name and time it was carried on.
-func (g *gpx) Metadata() (meta *Metadata) {
+func (g *gpxAdapter) Metadata() (meta *Metadata) {
 	meta = &Metadata{
 		Name: g.Name,
 		Time: g.Time,
@@ -55,7 +55,7 @@ func (g *gpx) Metadata() (meta *Metadata) {
 
 // DataPoints implements datapointProvider interface.
 // It converts a list of gpxTrackPoints to a list of datapoints.
-func (g *gpx) DataPoints() (list DataPointList) {
+func (g *gpxAdapter) DataPoints() (list DataPointList) {
 	list = make(DataPointList, len(g.TrackPoints))
 	for i, trackpoint := range g.TrackPoints {
 		list[i] = trackpoint.toDataPoint()

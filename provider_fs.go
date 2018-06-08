@@ -12,6 +12,7 @@ import (
 
 const (
 	extGpx fileExt = ".gpx"
+	extFit fileExt = ".fit"
 )
 
 var (
@@ -65,6 +66,8 @@ func getFileExt(fileName string) (ext fileExt, isGzip bool, err error) {
 	switch fileExt(extStr) {
 	case extGpx:
 		ext = extGpx
+	case extFit:
+		ext = extFit
 	default:
 		err = ErrUnknownExtension
 	}
@@ -74,7 +77,9 @@ func getFileExt(fileName string) (ext fileExt, isGzip bool, err error) {
 func getFileActivityProvider(ext fileExt, data []byte) (p activityProvider, err error) {
 	switch ext {
 	case extGpx:
-		p, err = newGpx(data)
+		p, err = newGpxAdapter(data)
+	case extFit:
+		p, err = newFitAdapter(data)
 	}
 	return
 }
