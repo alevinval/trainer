@@ -45,7 +45,7 @@ func (adapter *fitAdapter) Metadata() (meta *Metadata) {
 	activity, _ := adapter.file.Activity()
 	meta = &Metadata{
 		Time: activity.Activity.Timestamp,
-		Name: adapter.file.FileId.ProductName,
+		Name: "n/a", // Name of the activity is not available in fit exports... will need to work on that
 	}
 	return
 }
