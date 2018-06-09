@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/alevinval/trainer"
 	"github.com/spf13/cobra"
@@ -23,7 +24,11 @@ func init() {
 }
 
 func doClusterCommand(path string) error {
-	activities := findActivities(path, prefix)
+	activities, err := findActivities(path, prefix)
+	if err != nil {
+		log.Printf("cluster command failed: %s", err)
+		return err
+	}
 	for _, cluster := range trainer.GetClusters(activities, trainer.DistanceCriteria(5000.0)) {
 		tagCloud := trainer.TagCloudFromActivities(cluster.Activities)
 		avgPerf := cluster.Activities.DataPoints().AvgPerf()

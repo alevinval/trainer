@@ -32,6 +32,11 @@ func (a *Activity) Metadata() *Metadata {
 	return a.metadata
 }
 
+// SetMetadata sets the metadata object to the provided one.
+func (a *Activity) SetMetadata(newMetadata *Metadata) {
+	a.metadata = newMetadata
+}
+
 // DataPoints implements datapointProvider interface.
 func (a *Activity) DataPoints() DataPointList {
 	return a.datapoints

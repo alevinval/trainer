@@ -2,6 +2,7 @@ package trainer
 
 import (
 	"bytes"
+	"log"
 	"math"
 
 	"github.com/tormoder/fit"
@@ -21,7 +22,7 @@ func newFitAdapter(b []byte) (adapter *fitAdapter, err error) {
 func (adapter *fitAdapter) DataPoints() DataPointList {
 	activity, err := adapter.file.Activity()
 	if err != nil {
-		panic(err)
+		log.Fatalf("unexpected error processing fit file: %s", err)
 	}
 
 	list := make(DataPointList, 0)
@@ -45,7 +46,7 @@ func (adapter *fitAdapter) Metadata() (meta *Metadata) {
 	activity, _ := adapter.file.Activity()
 	meta = &Metadata{
 		Time: activity.Activity.Timestamp,
-		Name: "n/a", // Name of the activity is not available in fit exports... will need to work on that
+		Name: "", // Not available on fit files, enrichers can fill that up.
 	}
 	return
 }

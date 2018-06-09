@@ -5,13 +5,15 @@ import (
 )
 
 var (
-	prefix string
-	cmd    *cobra.Command
+	prefix              string
+	enrichStravaCsvPath string
+	cmd                 *cobra.Command
 )
 
 func init() {
 	cmd = &cobra.Command{Use: "trainer"}
 	cmd.PersistentFlags().StringVar(&prefix, "prefix", "", "only process files matching the prefix")
+	cmd.PersistentFlags().StringVar(&enrichStravaCsvPath, "strava-csv-enrich", "", "enrich metadata from a csv file")
 }
 
 func main() {

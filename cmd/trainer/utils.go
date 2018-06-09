@@ -2,8 +2,13 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"path"
 	"strings"
+	"sync"
+
+	"github.com/alevinval/trainer"
+	"github.com/alevinval/trainer/enrichers"
 )
 
 func findFiles(root string) (filePaths chan string, err error) {
@@ -21,7 +26,7 @@ func findFiles(root string) (filePaths chan string, err error) {
 	return
 }
 
-func findFilesWithPrefix(root string, prefix string) (filePaths chan string, err error) {
+func findPathsWithPrefix(root string, prefix string) (filePaths chan string, err error) {
 	paths, err := findFiles(root)
 	if err != nil {
 		return
@@ -41,4 +46,48 @@ func findFilesWithPrefix(root string, prefix string) (filePaths chan string, err
 		close(filePaths)
 	}()
 	return
+}
+
+func findActivities(lookupPath, prefix string) (activities trainer.ActivityList, err error) {
+	activities = trainer.ActivityList{}
+
+	paths, err := findPathsWithPrefix(lookupPath, prefix)
+	if err != nil {
+		log.Printf("cannot find activities in %s: %s\n", lookupPath, err)
+		return nil, err
+	}
+
+	wg := new(sync.WaitGroup)
+	mux := new(sync.Mutex)
+	for filePath := range paths {
+		wg.Add(1)
+		go func(path string) {
+			defer wg.Done()
+			activity, err := trainer.OpenFile(path)
+			if err != nil {
+				log.Printf("cannot open file %q: %s\n", path, err)
+				return
+			}
+			mux.Lock()
+			activities = append(activities, activity)
+			mux.Unlock()
+		}(filePath)
+	}
+	wg.Wait()
+
+	err = applyEnrichers(activities)
+	return
+}
+
+func applyEnrichers(activities trainer.ActivityList) (err error) {
+	list := []trainer.Enricher{}
+	if enrichStravaCsvPath != "" {
+		e, err := enrichers.NewStravaCsvEnricher(enrichStravaCsvPath)
+		if err != nil {
+			log.Printf("cannot apply  enricher: %s", err)
+			return err
+		}
+		list = append(list, e)
+	}
+	return trainer.EnrichActivities(activities, list...)
 }
