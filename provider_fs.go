@@ -90,7 +90,7 @@ func buildActivityFromFile(fileName string, provider activityProvider, data []by
 	datapoints := provider.DataPoints()
 	datapoints.process()
 	return &Activity{
-		Data:       data,
+		rawData:    data,
 		metadata:   metadata,
 		datapoints: datapoints,
 	}

@@ -18,7 +18,7 @@ type (
 	// your activity and the normalised datapoints with processed information
 	// such as speed, performance, etc...
 	Activity struct {
-		Data       []byte
+		rawData    []byte
 		metadata   *Metadata
 		datapoints DataPointList
 	}
