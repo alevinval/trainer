@@ -21,7 +21,7 @@ func TestStravaCsvEnrichActivity(t *testing.T) {
 		Name: "",
 		DataSource: trainer.DataSource{
 			Type: trainer.FileDataSource,
-			Name: "some-file-path.fit.gz",
+			Name: "783319746.fit.gz",
 		},
 	})
 
