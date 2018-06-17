@@ -50,3 +50,14 @@ func (al ActivityList) DataPoints() DataPointList {
 	}
 	return list
 }
+
+// Filter returns a list of activities that pass the filter function.
+func (al ActivityList) Filter(filterFn func(a *Activity) bool) ActivityList {
+	var list ActivityList
+	for _, activity := range al {
+		if filterFn(activity) {
+			list = append(list, activity)
+		}
+	}
+	return list
+}

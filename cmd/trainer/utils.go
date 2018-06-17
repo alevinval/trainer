@@ -74,8 +74,16 @@ func findActivities(lookupPath, prefix string) (activities trainer.ActivityList,
 		}(filePath)
 	}
 	wg.Wait()
-
 	err = applyEnrichers(activities)
+	if err != nil {
+		return
+	}
+	if filterByName != "" {
+		activities = activities.Filter(func(a *trainer.Activity) bool {
+			cloud := trainer.TagCloudFromActivities(trainer.ActivityList{a})
+			return cloud.Contains(filterByName)
+		})
+	}
 	return
 }
 

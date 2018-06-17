@@ -33,8 +33,8 @@ var tagCloudIgnoredWords = map[string]struct{}{
 // TagCloudFromActivities returns the cloud of rellevant words represented within
 // list of activities.
 func TagCloudFromActivities(activities ActivityList) *TagCloud {
-	tagCloud := &TagCloud{
-		tags: make(map[string]int),
+	cloud := &TagCloud{
+		tags: map[string]int{},
 	}
 	for _, activity := range activities {
 		metadata := activity.Metadata()
@@ -49,10 +49,28 @@ func TagCloudFromActivities(activities ActivityList) *TagCloud {
 			if _, ok := tagCloudIgnoredWords[word]; ok {
 				continue
 			}
-			tagCloud.tags[word]++
+			cloud.tags[cloud.normalize(word)]++
 		}
 	}
-	return tagCloud
+	return cloud
+}
+
+// Contains tells whether a tag is present in the tag cloud or not.
+func (tg *TagCloud) Contains(tag string) bool {
+	_, ok := tg.tags[tg.normalize(tag)]
+	return ok
+}
+
+func (tg *TagCloud) String() string {
+	list := ""
+	for _, word := range tg.asList() {
+		list += fmt.Sprintf("%s[%d] ", word, tg.tags[word])
+	}
+	return list
+}
+
+func (tg *TagCloud) normalize(tag string) string {
+	return strings.ToLower(tag)
 }
 
 func (tg *TagCloud) asList() []string {
@@ -64,12 +82,4 @@ func (tg *TagCloud) asList() []string {
 		return tg.tags[words[i]] > tg.tags[words[j]]
 	})
 	return words
-}
-
-func (tg *TagCloud) String() string {
-	list := ""
-	for _, word := range tg.asList() {
-		list += fmt.Sprintf("%s[%d] ", word, tg.tags[word])
-	}
-	return list
 }
