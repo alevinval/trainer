@@ -32,11 +32,15 @@ func (adapter *fitAdapter) DataPoints() DataPointList {
 			continue
 		}
 		list = append(list, &DataPoint{
-			Time:   record.Timestamp,
-			Coords: Point{record.PositionLat.Degrees(), record.PositionLong.Degrees()},
-			Hr:     HeartRate(record.HeartRate),
-			Cad:    Cadence(record.Cadence * 2),
-			n:      1,
+			Time: record.Timestamp,
+			Coords: Point{
+				record.PositionLat.Degrees(),
+				record.PositionLong.Degrees(),
+				float64(record.Altitude),
+			},
+			Hr:  HeartRate(record.HeartRate),
+			Cad: Cadence(record.Cadence * 2),
+			n:   1,
 		})
 	}
 	return list

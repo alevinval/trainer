@@ -27,9 +27,10 @@ type (
 	// Speed in (m/s)
 	Speed float64
 
-	// Point represents earth coordinates as pair of latitude-longitude.
+	// Point represents earth coordinates as pair of latitude-longitude and elevation.
 	Point struct {
-		Lat, Lon float64
+		Lat, Lon  float64
+		Elevation float64
 	}
 )
 
@@ -61,23 +62,27 @@ func (s Speed) String() string {
 }
 
 func (p Point) String() string {
-	return fmt.Sprintf("lat=%0.6f, lon=%0.6f", p.Lat, p.Lon)
+	return fmt.Sprintf("lat=%0.6f, lon=%0.6f, ele=%0.1f", p.Lat, p.Lon, p.Elevation)
 }
 
 // DistanceTo returns the distance in meters between two points.
 func (p Point) DistanceTo(other Point) float64 {
-	return approximateDistance(p.Lat, p.Lon, other.Lat, other.Lon)
+	return approximateDistance(p.Lat, p.Lon, p.Elevation, other.Lat, other.Lon, other.Elevation)
 }
 
 func hsin(theta float64) float64 {
 	return math.Pow(math.Sin(theta/2), 2)
 }
 
-func approximateDistance(lat1, lon1, lat2, lon2 float64) float64 {
+func approximateDistance(lat1, lon1, ele1, lat2, lon2, ele2 float64) float64 {
 	lat1 *= radiansFactor
 	lon1 *= radiansFactor
 	lat2 *= radiansFactor
 	lon2 *= radiansFactor
 	h := hsin(lat2-lat1) + math.Cos(lat1)*math.Cos(lat2)*hsin(lon2-lon1)
-	return 2 * earthRadius * math.Asin(math.Sqrt(h))
+	dx := float64(2 * earthRadius * math.Asin(math.Sqrt(h)))
+	dy := float64(ele2 - ele1)
+
+	// Euclidean approximation is good enough
+	return math.Sqrt(dx*dx + dy*dy)
 }
