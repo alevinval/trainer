@@ -28,7 +28,7 @@ func init() {
 }
 
 func doPerformanceCommand(path string) error {
-	activities, err := findActivities(path, prefix)
+	activities, err := findActivities(path)
 	if err != nil {
 		log.Printf("performance command failed: %s", err)
 	}

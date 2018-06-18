@@ -11,22 +11,53 @@ import (
 	"github.com/alevinval/trainer/enrichers"
 )
 
-func findFiles(root string) (filePaths chan string, err error) {
-	paths, err := ioutil.ReadDir(root)
+func findActivities(lookupPath string) (activities trainer.ActivityList, err error) {
+	paths, err := getPathsWithPrefix(lookupPath, filterByPrefix)
 	if err != nil {
-		return
+		log.Printf("cannot find activities in %s: %s\n", lookupPath, err)
+		return nil, err
 	}
-	filePaths = make(chan string)
-	go func() {
-		for _, filePath := range paths {
-			filePaths <- path.Join(root, filePath.Name())
+
+	activities = getActivitiesFromPaths(paths)
+
+	if stravaCsvEnrichPath != "" {
+		err = applyStravaEnricher(activities)
+		if err != nil {
+			return
 		}
-		close(filePaths)
-	}()
+	}
+
+	if filterByDate != "" {
+		activities = activities.Filter(func(a *trainer.Activity) bool {
+			date := a.Metadata().Time.Format("20060102")
+			return strings.HasPrefix(date, filterByDate)
+		})
+	}
+
+	if filterByDateFrom != "" {
+		activities = activities.Filter(func(a *trainer.Activity) bool {
+			date := a.Metadata().Time.Format("20060102")
+			return date[0:len(filterByDateFrom)] >= filterByDateFrom
+		})
+	}
+
+	if filterByDateTo != "" {
+		activities = activities.Filter(func(a *trainer.Activity) bool {
+			date := a.Metadata().Time.Format("20060102")
+			return date[0:len(filterByDateTo)] < filterByDateTo
+		})
+	}
+
+	if filterByName != "" {
+		activities = activities.Filter(func(a *trainer.Activity) bool {
+			cloud := trainer.TagCloudFromActivities(trainer.ActivityList{a})
+			return cloud.Contains(filterByName)
+		})
+	}
 	return
 }
 
-func findPathsWithPrefix(root string, prefix string) (filePaths chan string, err error) {
+func getPathsWithPrefix(root string, prefix string) (filePaths chan string, err error) {
 	paths, err := findFiles(root)
 	if err != nil {
 		return
@@ -48,17 +79,11 @@ func findPathsWithPrefix(root string, prefix string) (filePaths chan string, err
 	return
 }
 
-func findActivities(lookupPath, prefix string) (activities trainer.ActivityList, err error) {
-	activities = trainer.ActivityList{}
-
-	paths, err := findPathsWithPrefix(lookupPath, prefix)
-	if err != nil {
-		log.Printf("cannot find activities in %s: %s\n", lookupPath, err)
-		return nil, err
-	}
-
+func getActivitiesFromPaths(paths chan string) trainer.ActivityList {
 	wg := new(sync.WaitGroup)
 	mux := new(sync.Mutex)
+
+	activities := trainer.ActivityList{}
 	for filePath := range paths {
 		wg.Add(1)
 		go func(path string) {
@@ -74,30 +99,29 @@ func findActivities(lookupPath, prefix string) (activities trainer.ActivityList,
 		}(filePath)
 	}
 	wg.Wait()
+	return activities
+}
 
-	err = applyEnrichers(activities)
+func findFiles(root string) (filePaths chan string, err error) {
+	paths, err := ioutil.ReadDir(root)
 	if err != nil {
 		return
 	}
-
-	if filterByName != "" {
-		activities = activities.Filter(func(a *trainer.Activity) bool {
-			cloud := trainer.TagCloudFromActivities(trainer.ActivityList{a})
-			return cloud.Contains(filterByName)
-		})
-	}
+	filePaths = make(chan string)
+	go func() {
+		for _, filePath := range paths {
+			filePaths <- path.Join(root, filePath.Name())
+		}
+		close(filePaths)
+	}()
 	return
 }
 
-func applyEnrichers(activities trainer.ActivityList) (err error) {
-	list := []trainer.Enricher{}
-	if enrichStravaCsvPath != "" {
-		e, err := enrichers.NewStravaCsvEnricher(enrichStravaCsvPath)
-		if err != nil {
-			log.Printf("cannot apply  enricher: %s", err)
-			return err
-		}
-		list = append(list, e)
+func applyStravaEnricher(activities trainer.ActivityList) (err error) {
+	stravaEnricher, err := enrichers.NewStravaCsvEnricher(stravaCsvEnrichPath)
+	if err != nil {
+		log.Printf("cannot apply  enricher: %s", err)
+		return err
 	}
-	return trainer.EnrichActivities(activities, list...)
+	return trainer.EnrichActivities(activities, stravaEnricher)
 }

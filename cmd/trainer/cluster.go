@@ -24,7 +24,7 @@ func init() {
 }
 
 func doClusterCommand(path string) error {
-	activities, err := findActivities(path, prefix)
+	activities, err := findActivities(path)
 	if err != nil {
 		log.Printf("cluster command failed: %s", err)
 		return err
