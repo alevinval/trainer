@@ -57,63 +57,74 @@ func findActivities(lookupPath string) (activities trainer.ActivityList, err err
 	return
 }
 
-func getPathsWithPrefix(root string, prefix string) (filePaths chan string, err error) {
-	paths, err := findFiles(root)
-	if err != nil {
-		return
-	}
+func getPathsWithPrefix(root string, prefix string) (prefixedPaths []string, err error) {
 	prefix = path.Join(root, prefix)
-	filePaths = make(chan string)
-	go func() {
-		for filePath := range paths {
-			if len(filePath) < len(prefix) {
-				continue
-			}
-			if strings.Compare(filePath[:len(prefix)], prefix) != 0 {
-				continue
-			}
-			filePaths <- filePath
+
+	paths, err := findPaths(root)
+	if err != nil {
+		return nil, err
+	}
+
+	prefixedPaths = make([]string, 0)
+	for i := range paths {
+		if len(paths[i]) < len(prefix) {
+			continue
 		}
-		close(filePaths)
-	}()
+		if strings.Compare(paths[i][:len(prefix)], prefix) != 0 {
+			continue
+		}
+		prefixedPaths = append(prefixedPaths, paths[i])
+	}
 	return
 }
 
-func getActivitiesFromPaths(paths chan string) trainer.ActivityList {
+func getActivitiesFromPaths(paths []string) (list trainer.ActivityList) {
 	wg := new(sync.WaitGroup)
-	mux := new(sync.Mutex)
+	wg.Add(len(paths))
 
-	activities := trainer.ActivityList{}
-	for filePath := range paths {
-		wg.Add(1)
-		go func(path string) {
-			defer wg.Done()
-			activity, err := trainer.OpenFile(path)
-			if err != nil {
-				log.Printf("cannot open file %q: %s\n", path, err)
-				return
-			}
-			mux.Lock()
-			activities = append(activities, activity)
-			mux.Unlock()
-		}(filePath)
+	inputCh := make(chan string, len(paths))
+	for i := range paths {
+		inputCh <- paths[i]
+	}
+	close(inputCh)
+
+	activitiesCh := make(chan *trainer.Activity, len(paths))
+
+	maxParallelOpen := 10
+	for w := 0; w < maxParallelOpen; w++ {
+		go loadActivityWorker(wg, inputCh, activitiesCh)
 	}
 	wg.Wait()
-	return activities
+	close(activitiesCh)
+
+	list = make(trainer.ActivityList, 0)
+	for activity := range activitiesCh {
+		list = append(list, activity)
+	}
+	return
 }
 
-func findFiles(root string) (filePaths chan string, err error) {
-	paths, err := ioutil.ReadDir(root)
-	if err != nil {
-		return
-	}
-	filePaths = make(chan string)
-	go func() {
-		for _, filePath := range paths {
-			filePaths <- path.Join(root, filePath.Name())
+func loadActivityWorker(wg *sync.WaitGroup, paths <-chan string, activities chan<- *trainer.Activity) {
+	for path := range paths {
+		defer wg.Done()
+		activity, err := trainer.OpenFile(path)
+		if err != nil {
+			log.Printf("cannot open file %q: %s\n", path, err)
+			return
 		}
-		close(filePaths)
-	}()
+		activities <- activity
+	}
+}
+
+func findPaths(root string) (filePaths []string, err error) {
+	files, err := ioutil.ReadDir(root)
+	if err != nil {
+		return nil, err
+	}
+	filePaths = make([]string, len(files))
+	for i := range files {
+		filePaths[i] = path.Join(root, files[i].Name())
+	}
 	return
 }
 
