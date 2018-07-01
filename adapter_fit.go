@@ -36,7 +36,7 @@ func (adapter *fitAdapter) DataPoints() DataPointList {
 			Coords: Point{
 				record.PositionLat.Degrees(),
 				record.PositionLong.Degrees(),
-				float64(record.GetAltitudeScaled()),
+				record.GetAltitudeScaled(),
 			},
 			Hr:  HeartRate(record.HeartRate),
 			Cad: Cadence(record.Cadence * 2),
