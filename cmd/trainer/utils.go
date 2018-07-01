@@ -110,7 +110,7 @@ func loadActivityWorker(wg *sync.WaitGroup, paths <-chan string, activities chan
 		activity, err := trainer.OpenFile(path)
 		if err != nil {
 			log.Printf("cannot open file %q: %s\n", path, err)
-			return
+			continue
 		}
 		activities <- activity
 	}
