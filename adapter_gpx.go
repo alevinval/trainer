@@ -24,9 +24,13 @@ type (
 
 func (tp *gpxTrackPoint) toDataPoint() (dp *DataPoint) {
 	dp = &DataPoint{
-		Time:   tp.Time,
-		Coords: Point{tp.Lat, tp.Lon, tp.Ele},
-		Hr:     HeartRate(tp.Hr),
+		Time: tp.Time,
+		Coords: Point{
+			tp.Lat,
+			tp.Lon,
+			Elevation(tp.Ele),
+		},
+		Hr: HeartRate(tp.Hr),
 
 		// Count both feet for cadence.
 		Cad: Cadence(tp.Cad * 2),

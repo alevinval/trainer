@@ -21,12 +21,13 @@ func TestUnitsToString(t *testing.T) {
 		{unit: Pace(speed3m30s), expected: "3:30 min/km"},
 		{unit: Pace(0), expected: "n/a"},
 		{unit: Performance(1.12345), expected: "1.12"},
-		{unit: Point{1, 2, 0}, expected: "lat=1.000000, lon=2.000000, ele=0.0"},
+		{unit: Point{1, 2, 100}, expected: "lat=1.000000, lon=2.000000, ele=100.0m"},
 		{unit: HeartRate(129), expected: "129 bpm"},
 		{unit: speed3m30s, expected: "4.76 m/s"},
 		{unit: Distance(0.123), expected: "0.12 m"},
+		{unit: Elevation(123.3), expected: "123.3m"},
 	} {
-		assert.Equal(t, test.unit.String(), test.expected)
+		assert.Equal(t, test.expected, test.unit.String())
 	}
 }
 

@@ -30,10 +30,13 @@ type (
 	// Distance in (m)
 	Distance float64
 
+	// Elevation in (m)
+	Elevation float64
+
 	// Point represents earth coordinates as pair of latitude-longitude and elevation.
 	Point struct {
 		Lat, Lon  float64
-		Elevation float64
+		Elevation Elevation
 	}
 )
 
@@ -68,14 +71,18 @@ func (d Distance) String() string {
 	return fmt.Sprintf("%0.2f m", d)
 }
 
+func (e Elevation) String() string {
+	return fmt.Sprintf("%0.1fm", e)
+}
+
 func (p Point) String() string {
-	return fmt.Sprintf("lat=%0.6f, lon=%0.6f, ele=%0.1f", p.Lat, p.Lon, p.Elevation)
+	return fmt.Sprintf("lat=%0.6f, lon=%0.6f, ele=%s", p.Lat, p.Lon, p.Elevation)
 }
 
 // DistanceTo returns the distance in meters between two points.
 func (p Point) DistanceTo(other Point) Distance {
 	return Distance(
-		approximateDistance(p.Lat, p.Lon, p.Elevation, other.Lat, other.Lon, other.Elevation),
+		approximateDistance(p.Lat, p.Lon, float64(p.Elevation), other.Lat, other.Lon, float64(other.Elevation)),
 	)
 }
 
