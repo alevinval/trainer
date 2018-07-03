@@ -24,6 +24,7 @@ func TestUnitsToString(t *testing.T) {
 		{unit: Point{1, 2, 0}, expected: "lat=1.000000, lon=2.000000, ele=0.0"},
 		{unit: HeartRate(129), expected: "129 bpm"},
 		{unit: speed3m30s, expected: "4.76 m/s"},
+		{unit: Distance(0.123), expected: "0.12 m"},
 	} {
 		assert.Equal(t, test.unit.String(), test.expected)
 	}
@@ -31,7 +32,7 @@ func TestUnitsToString(t *testing.T) {
 
 func TestPointDistance(t *testing.T) {
 	p1, p2 := Point{1, 1, 1}, Point{2, 2, 2}
-	assert.Equal(t, p1.DistanceTo(p1), float64(0))
+	assert.Equal(t, p1.DistanceTo(p1), Distance(0))
 	assert.True(t, p1.DistanceTo(p2) > 0)
 	assert.True(t, p2.DistanceTo(p1) > 0)
 }

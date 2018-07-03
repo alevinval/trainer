@@ -28,7 +28,7 @@ type (
 var undefinedCoords = Point{}
 
 // DistanceTo returns the distance in meters between two datapoints.
-func (dp *DataPoint) DistanceTo(next *DataPoint) float64 {
+func (dp *DataPoint) DistanceTo(next *DataPoint) Distance {
 	return dp.Coords.DistanceTo(next.Coords)
 }
 
@@ -40,7 +40,7 @@ func (dp *DataPoint) computeSpeed(prevDataPoint *DataPoint) {
 	if dp.Coords == undefinedCoords {
 		return
 	}
-	meters := prevDataPoint.DistanceTo(dp)
+	meters := float64(prevDataPoint.DistanceTo(dp))
 	seconds := prevDataPoint.secondsTo(dp)
 	dp.Speed = Speed(meters / seconds)
 }

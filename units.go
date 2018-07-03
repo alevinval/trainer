@@ -27,6 +27,9 @@ type (
 	// Speed in (m/s)
 	Speed float64
 
+	// Distance in (m)
+	Distance float64
+
 	// Point represents earth coordinates as pair of latitude-longitude and elevation.
 	Point struct {
 		Lat, Lon  float64
@@ -61,13 +64,19 @@ func (s Speed) String() string {
 	return fmt.Sprintf("%0.2f m/s", s)
 }
 
+func (d Distance) String() string {
+	return fmt.Sprintf("%0.2f m", d)
+}
+
 func (p Point) String() string {
 	return fmt.Sprintf("lat=%0.6f, lon=%0.6f, ele=%0.1f", p.Lat, p.Lon, p.Elevation)
 }
 
 // DistanceTo returns the distance in meters between two points.
-func (p Point) DistanceTo(other Point) float64 {
-	return approximateDistance(p.Lat, p.Lon, p.Elevation, other.Lat, other.Lon, other.Elevation)
+func (p Point) DistanceTo(other Point) Distance {
+	return Distance(
+		approximateDistance(p.Lat, p.Lon, p.Elevation, other.Lat, other.Lon, other.Elevation),
+	)
 }
 
 func hsin(theta float64) float64 {

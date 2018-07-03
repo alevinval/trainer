@@ -10,9 +10,10 @@ import (
 // DistanceCriteria clusters activities that fall within a distance
 // threshold between them.
 var DistanceCriteria = func(distance float64) clusteringCriteria {
+	d := Distance(distance)
 	return func(c *Cluster, a *Activity) bool {
 		startingPoint := a.DataPoints()[0].Coords
-		return startingPoint.DistanceTo(c.Coords) < distance
+		return startingPoint.DistanceTo(c.Coords) < d
 	}
 }
 
