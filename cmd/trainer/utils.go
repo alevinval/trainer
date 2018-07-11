@@ -23,6 +23,7 @@ func findActivities(lookupPath string) (activities trainer.ActivityList, err err
 	if stravaCsvEnrichPath != "" {
 		err = applyStravaEnricher(activities)
 		if err != nil {
+			log.Printf("cannot apply strava csv enricher: %s", err)
 			return
 		}
 	}
@@ -131,7 +132,6 @@ func findPaths(root string) (filePaths []string, err error) {
 func applyStravaEnricher(activities trainer.ActivityList) (err error) {
 	stravaEnricher, err := enrichers.NewStravaCsvEnricher(stravaCsvEnrichPath)
 	if err != nil {
-		log.Printf("cannot apply  enricher: %s", err)
 		return err
 	}
 	return trainer.EnrichActivities(activities, stravaEnricher)
