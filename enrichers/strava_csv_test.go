@@ -5,16 +5,17 @@ import (
 
 	"github.com/alevinval/trainer"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStravaCsvEnrichFailOpen(t *testing.T) {
-	_, err := NewStravaCsvEnricher("../tests/missing-file.csv")
+	_, err := NewStravaCsvEnricher("testdata/missing-file.csv")
 	assert.NotNil(t, err)
 }
 
 func TestStravaCsvEnrichActivity(t *testing.T) {
-	enricher, err := NewStravaCsvEnricher("../tests/activities.csv")
-	assert.Nil(t, err)
+	enricher, err := NewStravaCsvEnricher("testdata/strava_activities.csv")
+	require.Nil(t, err)
 
 	a := &trainer.Activity{}
 	a.SetMetadata(&trainer.Metadata{
