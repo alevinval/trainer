@@ -9,47 +9,57 @@ import (
 )
 
 type stravaCsvEnricher struct {
-	r               *csv.Reader
-	fileNameCol     int
-	activityNameCol int
-
-	fileToActivityMap map[string]string
+	activityNameCol        int
+	fileNameCol            int
+	fileNameToActivityName map[string]string
 }
 
-func NewStravaCsvEnricher(filePath string) (enricher *stravaCsvEnricher, err error) {
+// NewStravaCsvEnricher returns an enricher of activites
+// using strava dumps metadata.
+func NewStravaCsvEnricher(filePath string) (trainer.Enricher, error) {
 	file, err := os.Open(filePath)
-	if err != nil {
-		return
-	}
-	enricher = &stravaCsvEnricher{
-		r:                 csv.NewReader(file),
-		fileNameCol:       9,
-		activityNameCol:   2,
-		fileToActivityMap: map[string]string{},
-	}
-	records, err := enricher.r.ReadAll()
 	if err != nil {
 		return nil, err
 	}
-	for _, columns := range records {
-		fileName := path.Base(columns[enricher.fileNameCol])
-		activityName := columns[enricher.activityNameCol]
-		enricher.fileToActivityMap[fileName] = activityName
+
+	r := csv.NewReader(file)
+	records, err := r.ReadAll()
+	if err != nil {
+		return nil, err
 	}
-	return
+
+	enricher := &stravaCsvEnricher{
+		activityNameCol:        2,
+		fileNameCol:            9,
+		fileNameToActivityName: map[string]string{},
+	}
+	enricher.buildActivityNameMap(records)
+	return enricher, nil
+}
+
+func (e *stravaCsvEnricher) buildActivityNameMap(records [][]string) {
+	for _, columns := range records {
+		fileName := path.Base(columns[e.fileNameCol])
+		activityName := columns[e.activityNameCol]
+		e.fileNameToActivityName[fileName] = activityName
+	}
 }
 
 func (e *stravaCsvEnricher) Enrich(a *trainer.Activity) (err error) {
-	if a.Metadata().DataSource.Type != trainer.FileDataSource {
-		return nil
-	}
-	fileName := path.Base(a.Metadata().DataSource.Name)
-	activityName, ok := e.fileToActivityMap[fileName]
-	if !ok {
+	m := a.Metadata()
+
+	// Only enrich activities coming from files.
+	if m.DataSource.Type != trainer.FileDataSource {
 		return
 	}
-	enrichedMetadata := a.Metadata()
-	enrichedMetadata.Name = activityName
-	a.SetMetadata(enrichedMetadata)
-	return nil
+
+	// See if the strava metadata csv contains activity name
+	// for that file
+	fileName := path.Base(m.DataSource.Name)
+	activityName, hasName := e.fileNameToActivityName[fileName]
+	if hasName {
+		a.Metadata().Name = activityName
+	}
+
+	return
 }
