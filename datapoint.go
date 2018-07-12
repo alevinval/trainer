@@ -116,6 +116,12 @@ func (list DataPointList) DataPoints() DataPointList {
 	return list
 }
 
+// Laps computes laps by distance
+func (list DataPointList) Laps(d Distance) []*Lap {
+	b := lapBuilder{}
+	return b.fromList(list, d)
+}
+
 // GetHistogram generates a histogram for the list of datapoints
 func (list DataPointList) GetHistogram() *Histogram {
 	hist := new(Histogram)

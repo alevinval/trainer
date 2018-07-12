@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -42,6 +43,14 @@ func doPerformanceCommand(path string) error {
 		trainer.WriteCsvTo(histogram, output)
 	} else {
 		trainer.PrintHistogram(histogram)
+		if len(activities) == 1 {
+			activity := activities[0]
+			fmt.Printf("Overall performance: %s\n", activity.DataPoints().AvgPerf())
+			laps := activity.DataPoints().Laps(1000)
+			for i, lap := range laps {
+				fmt.Printf("Lap %d:\n\t%s (p=%s) (d=%s)\n", i, lap.Pace, lap.Performance, lap.Distance)
+			}
+		}
 	}
 	return nil
 }

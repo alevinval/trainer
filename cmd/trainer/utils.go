@@ -55,6 +55,10 @@ func findActivities(lookupPath string) (activities trainer.ActivityList, err err
 			return cloud.Contains(filterByName)
 		})
 	}
+
+	for _, activity := range activities {
+		log.Printf("Activity: %s", activity.Metadata().Name)
+	}
 	return
 }
 
