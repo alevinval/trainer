@@ -56,9 +56,14 @@ func findActivities(lookupPath string) (activities trainer.ActivityList, err err
 		})
 	}
 
-	for _, activity := range activities {
-		log.Printf("Activity: %s", activity.Metadata().Name)
+	activities.SortByTime()
+
+	if logDebug {
+		for _, activity := range activities {
+			log.Printf("Activity: %s", activity.Metadata().Name)
+		}
 	}
+
 	return
 }
 

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/spf13/cobra"
 )
 
@@ -11,6 +13,7 @@ var (
 	filterByDate        string
 	filterByDateFrom    string
 	filterByDateTo      string
+	logDebug            bool
 	cmd                 *cobra.Command
 )
 
@@ -22,10 +25,14 @@ func init() {
 	cmd.PersistentFlags().StringVar(&filterByDate, "date", "", "Filters activities whose date does not match with the filter")
 	cmd.PersistentFlags().StringVar(&filterByDateFrom, "date-from", "", "Filters activities whose date is above the specified date prefix (inclusive)")
 	cmd.PersistentFlags().StringVar(&filterByDateTo, "date-to", "", "Filters activities whose date is below the specified date prefix (non-inclusive)")
+	cmd.PersistentFlags().BoolVar(&logDebug, "debug", false, "Log debug traces")
 }
 
 func main() {
+	log.SetFlags(0)
+
 	cmd.AddCommand(performanceCmd)
 	cmd.AddCommand(clusterCmd)
+	cmd.AddCommand(trainingCmd)
 	cmd.Execute()
 }

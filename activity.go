@@ -1,5 +1,10 @@
 package trainer
 
+import (
+	"sort"
+	"time"
+)
+
 type (
 	dataPointProvider interface {
 		DataPoints() DataPointList
@@ -43,21 +48,53 @@ func (a *Activity) DataPoints() DataPointList {
 }
 
 // DataPoints implements datapointProvider interface.
-func (al ActivityList) DataPoints() DataPointList {
-	list := make(DataPointList, 0, len(al))
-	for _, activity := range al {
-		list = append(list, activity.DataPoints()...)
+func (list ActivityList) DataPoints() DataPointList {
+	l := make(DataPointList, 0, len(list))
+	for _, activity := range list {
+		l = append(l, activity.DataPoints()...)
 	}
-	return list
+	return l
 }
 
 // Filter returns a list of activities that pass the filter function.
-func (al ActivityList) Filter(filterFn func(a *Activity) bool) ActivityList {
-	var list ActivityList
-	for _, activity := range al {
+func (list ActivityList) Filter(filterFn func(a *Activity) bool) ActivityList {
+	var filtered ActivityList
+	for _, activity := range list {
 		if filterFn(activity) {
-			list = append(list, activity)
+			filtered = append(filtered, activity)
 		}
 	}
-	return list
+	return filtered
+}
+
+// SortByTime ensures the list of activities are sorted by date of the activity,
+// from oldest to newest.
+func (list ActivityList) SortByTime() {
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].metadata.Time.Before(list[j].metadata.Time)
+	})
+}
+
+// ChunkByDuration chunks the list of activities in time windows of a certain duration
+func (list ActivityList) ChunkByDuration(d time.Duration) []ActivityList {
+	chunks := []ActivityList{}
+	if len(list) == 0 {
+		return chunks
+	}
+
+	chunk := ActivityList{list[0]}
+	chunkTime := list[0].metadata.Time
+	for _, activity := range list[1:] {
+		if activity.metadata.Time.Sub(chunkTime) > d {
+			chunks = append(chunks, chunk)
+			chunk = ActivityList{activity}
+			chunkTime = activity.metadata.Time
+			continue
+		}
+		chunk = append(chunk, activity)
+	}
+	if len(chunk) > 0 {
+		chunks = append(chunks, chunk)
+	}
+	return chunks
 }

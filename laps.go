@@ -25,6 +25,11 @@ type lapBuilder struct {
 	eleDown Elevation
 }
 
+// DataPoints implements datapointProvider interface.
+func (l *Lap) DataPoints() DataPointList {
+	return l.dataPoints
+}
+
 func (l Lap) String() string {
 	return fmt.Sprintf(
 		"%s - %s - %s",
@@ -69,7 +74,6 @@ func (b *lapBuilder) accumulate() {
 
 func (b *lapBuilder) buildLap(list DataPointList) *Lap {
 	dataPoints := list[b.offset:b.i]
-	dataPoints.process()
 	speed := dataPoints.AvgSpeed()
 	perf := dataPoints.AvgPerf()
 	return &Lap{
