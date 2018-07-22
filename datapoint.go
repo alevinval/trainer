@@ -69,6 +69,12 @@ func (list DataPointList) process() {
 	}
 }
 
+// AvgHeartRate returns the average heart rate of all datapoints in the list.
+func (list DataPointList) AvgHeartRate() HeartRate {
+	avg := list.weightedAverage(getterHeartRate)
+	return HeartRate(avg)
+}
+
 // AvgSpeed returns the average speed of all datapoints in the list.
 func (list DataPointList) AvgSpeed() Speed {
 	avg := list.weightedAverage(getterSpeed)
@@ -128,6 +134,10 @@ func (list DataPointList) GetHistogram() *Histogram {
 	hist.Reset()
 	hist.Feed(list)
 	return hist
+}
+
+func getterHeartRate(dp *DataPoint) float64 {
+	return float64(dp.Hr)
 }
 
 func getterCad(dp *DataPoint) float64 {
