@@ -82,19 +82,16 @@ func (list ActivityList) ChunkByDuration(d time.Duration) []ActivityList {
 		return chunks
 	}
 
-	chunk := ActivityList{list[0]}
-	chunkTime := list[0].metadata.Time
-	for _, activity := range list[1:] {
-		if activity.metadata.Time.Sub(chunkTime) > d {
+	first := list[0]
+	chunk, chunkTime := ActivityList{first}, first.metadata.Time
+	for _, a := range list[1:] {
+		if a.metadata.Time.Sub(chunkTime) >= d {
 			chunks = append(chunks, chunk)
-			chunk = ActivityList{activity}
-			chunkTime = activity.metadata.Time
+			chunk, chunkTime = ActivityList{a}, a.metadata.Time
 			continue
 		}
-		chunk = append(chunk, activity)
+		chunk = append(chunk, a)
 	}
-	if len(chunk) > 0 {
-		chunks = append(chunks, chunk)
-	}
+	chunks = append(chunks, chunk)
 	return chunks
 }
