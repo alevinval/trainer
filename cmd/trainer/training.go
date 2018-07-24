@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -32,14 +31,14 @@ func init() {
 	trainingCmd.Flags().StringVar(&trainingWindow, "window", "week", "time-frame used to analyze performance evolution (week, month, year)")
 }
 
-func getTrainingWindowDuration() (time.Duration, string) {
+func getTrainingWindowDuration() time.Duration {
 	switch trainingWindow {
 	case "month":
-		return monthWindow, "month"
+		return monthWindow
 	case "year":
-		return yearWindow, "year"
+		return yearWindow
 	}
-	return weekWindow, "week"
+	return weekWindow
 }
 
 func doTraining(path string) {
@@ -47,22 +46,25 @@ func doTraining(path string) {
 	if err != nil {
 		log.Printf("training command failed: %s", err)
 	}
-	window, windowStr := getTrainingWindowDuration()
+	window := getTrainingWindowDuration()
 	chunks := activities.ChunkByDuration(window)
 
 	lastActivity := chunks[0][len(chunks[0])-1]
-	for i, chunk := range chunks {
-		fmtStr := fmt.Sprintf("%s %2d: p=%s a=%-3d n=%-5d",
-			strings.Title(windowStr),
-			i,
+	for _, chunk := range chunks {
+		dateFromStr := chunk[0].Metadata().Time.Format("2006-01-02")
+		fmtStr := fmt.Sprintf("%s: p=%s hr=%d cad=%.0f speed=%0.2f [a=%-3d n=%-5d]",
+			dateFromStr,
 			chunk.DataPoints().AvgPerf(),
+			chunk.DataPoints().AvgHeartRate(),
+			chunk.DataPoints().AvgCad(),
+			chunk.DataPoints().AvgSpeed(),
 			len(chunk),
 			len(chunk.DataPoints()),
 		)
 
 		breakTime := chunk[0].Metadata().Time.Sub(lastActivity.Metadata().Time)
 		if breakTime > window {
-			fmtStr += fmt.Sprintf(" [break=%.1f days]", breakTime.Hours()/24)
+			fmtStr += fmt.Sprintf(" %.1f days break", breakTime.Hours()/24)
 		}
 
 		fmtStr += "\n"
