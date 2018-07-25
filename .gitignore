@@ -1,1 +1,3 @@
+cmd/trainer/trainer
+cmd/trainer/trainer.exe
 *.gpx
