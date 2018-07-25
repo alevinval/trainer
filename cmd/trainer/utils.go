@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/alevinval/trainer"
-	"github.com/alevinval/trainer/enrichers"
+	"github.com/alevinval/trainer/internal"
+	"github.com/alevinval/trainer/internal/enrichers"
 )
 
 func findActivities(lookupPath string) (activities trainer.ActivityList, err error) {

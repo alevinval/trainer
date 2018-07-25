@@ -3,7 +3,7 @@ package enrichers
 import (
 	"testing"
 
-	"github.com/alevinval/trainer"
+	"github.com/alevinval/trainer/internal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
