@@ -6,17 +6,17 @@ import (
 )
 
 type (
-	dataPointProvider interface {
+	DataPointProvider interface {
 		DataPoints() DataPointList
 	}
 
-	metadataProvider interface {
+	MetadataProvider interface {
 		Metadata() *Metadata
 	}
 
-	activityProvider interface {
-		metadataProvider
-		dataPointProvider
+	ActivityProvider interface {
+		MetadataProvider
+		DataPointProvider
 	}
 
 	// Activity is the main domain object, it contains metadata about
@@ -31,6 +31,14 @@ type (
 	// ActivityList is a list of activities.
 	ActivityList []*Activity
 )
+
+func NewActivity(data []byte, metadata *Metadata, datapoints DataPointList) *Activity {
+	return &Activity{
+		rawData:    data,
+		metadata:   metadata,
+		datapoints: datapoints,
+	}
+}
 
 // Metadata implements metadataProvider interface.
 func (a *Activity) Metadata() *Metadata {

@@ -16,7 +16,7 @@ type (
 		Speed  Speed
 		Perf   Performance
 
-		n int
+		N int
 	}
 
 	// DataPointList is a list of DataPoint elements
@@ -57,7 +57,7 @@ func (dp *DataPoint) DataPoints() DataPointList {
 	return DataPointList{dp}
 }
 
-func (list DataPointList) process() {
+func (list DataPointList) Process() {
 	if len(list) <= 1 {
 		return
 	}
@@ -97,12 +97,12 @@ func (list DataPointList) weightedAverage(getter getterFunc) float64 {
 	var sum float64
 	var size int
 	for _, datapoint := range list {
-		weightedValue := getter(datapoint) * float64(datapoint.n)
+		weightedValue := getter(datapoint) * float64(datapoint.N)
 		if math.IsNaN(weightedValue) {
 			continue
 		}
 		sum += weightedValue
-		size += datapoint.n
+		size += datapoint.N
 	}
 	return sum / float64(size)
 }

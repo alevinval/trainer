@@ -10,8 +10,8 @@ import (
 
 func getMaxWidth(flat *FlatHistogram) (max int) {
 	for _, datapoints := range flat.Data() {
-		if datapoints.n > max {
-			max = datapoints.n
+		if datapoints.N > max {
+			max = datapoints.N
 		}
 	}
 	return
@@ -34,7 +34,7 @@ func WriteCsvTo(hist *Histogram, w io.Writer) {
 	fmt.Fprint(w, "BPM,N,Pace,Speed,Cadence,Perf(steps/s * m/s / bps)\n")
 	for _, hr := range hrs {
 		dp := flat.Data()[hr]
-		fmt.Fprintf(w, "%d,%d,%0.2f,%0.2f,%0.0f,%0.2f\n", hr, dp.n, Pace(dp.Speed), dp.Speed, dp.Cad, dp.Perf)
+		fmt.Fprintf(w, "%d,%d,%0.2f,%0.2f,%0.0f,%0.2f\n", hr, dp.N, Pace(dp.Speed), dp.Speed, dp.Cad, dp.Perf)
 	}
 }
 
@@ -45,7 +45,7 @@ func PrintHistogram(hist *Histogram) {
 	maxDots := 50
 	for _, hr := range hrs {
 		datapoint := flat.Data()[hr]
-		numDots := int(math.Floor(50 * float64(datapoint.n) / float64(maxWidth)))
+		numDots := int(math.Floor(50 * float64(datapoint.N) / float64(maxWidth)))
 		if numDots == 0 {
 			continue
 		}

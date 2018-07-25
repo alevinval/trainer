@@ -15,7 +15,7 @@ func (hist *Histogram) Reset() {
 	hist.data = make(bpmToDataPoints)
 }
 
-func (hist *Histogram) Feed(provider dataPointProvider) {
+func (hist *Histogram) Feed(provider DataPointProvider) {
 	for _, dp := range provider.DataPoints() {
 		_, ok := hist.data[dp.Hr]
 		if !ok {
@@ -39,7 +39,7 @@ func (hist *Histogram) Flatten() *FlatHistogram {
 			Cad:   datapoints.AvgCad(),
 			Perf:  datapoints.AvgPerf(),
 			Hr:    bpm,
-			n:     len(datapoints),
+			N:     len(datapoints),
 		}
 		flat.data[bpm] = avg
 	}

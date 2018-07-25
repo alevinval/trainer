@@ -1,4 +1,4 @@
-package trainer
+package providers
 
 import (
 	"compress/gzip"
@@ -8,6 +8,9 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	trainer "github.com/alevinval/trainer/internal"
+	"github.com/alevinval/trainer/pkg/providers/adapters"
 )
 
 const (
@@ -25,7 +28,7 @@ type (
 )
 
 // OpenFile reads a file content and returns an Activity.
-func OpenFile(fileName string) (a *Activity, err error) {
+func OpenFile(fileName string) (a *trainer.Activity, err error) {
 	ext, isGzip, err := getFileExt(fileName)
 	if err != nil {
 		return nil, err
@@ -74,24 +77,22 @@ func getFileExt(fileName string) (ext fileExt, isGzip bool, err error) {
 	return
 }
 
-func getFileActivityProvider(ext fileExt, data []byte) (p activityProvider, err error) {
+func getFileActivityProvider(ext fileExt, data []byte) (p trainer.ActivityProvider, err error) {
 	switch ext {
 	case extGpx:
-		p, err = newGpxAdapter(data)
+		p, err = adapters.NewGpxAdapter(data)
 	case extFit:
-		p, err = newFitAdapter(data)
+		p, err = adapters.NewFitAdapter(data)
 	}
 	return
 }
 
-func buildActivityFromFile(fileName string, provider activityProvider, data []byte) *Activity {
+func buildActivityFromFile(fileName string, provider trainer.ActivityProvider, data []byte) *trainer.Activity {
 	metadata := provider.Metadata()
-	metadata.DataSource = newDataSource(FileDataSource, fileName)
-	datapoints := provider.DataPoints()
-	datapoints.process()
-	return &Activity{
-		rawData:    data,
-		metadata:   metadata,
-		datapoints: datapoints,
+	metadata.DataSource = trainer.DataSource{
+		Type: trainer.FileDataSource,
+		Name: fileName,
 	}
+	datapoints := provider.DataPoints()
+	return trainer.NewActivity(data, metadata, datapoints)
 }

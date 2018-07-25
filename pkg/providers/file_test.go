@@ -1,4 +1,4 @@
-package trainer
+package providers
 
 import (
 	"bytes"
@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/alevinval/trainer/internal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -106,7 +107,7 @@ func TestOpenFile(t *testing.T) {
 		}
 		if err == nil {
 			metadata := activity.Metadata()
-			assert.Equal(t, newDataSource(FileDataSource, filePath), metadata.DataSource)
+			assert.Equal(t, trainer.DataSource{Type: trainer.FileDataSource, Name: filePath}, metadata.DataSource)
 			assert.Equal(t, test.dataPointsLen, len(activity.DataPoints()))
 		}
 	}

@@ -16,14 +16,14 @@ const (
 
 func getTestInputDataPoints() DataPointList {
 	input := DataPointList{
-		&DataPoint{Hr: bpm130, Speed: speed10, Cad: cad180, n: 1},
-		&DataPoint{Hr: bpm150, Speed: speed10, Cad: cad180, n: 1},
-		&DataPoint{Hr: bpm150, Speed: speed10, Cad: cad180, n: 1},
-		&DataPoint{Hr: bpm180, Speed: speed10, Cad: cad180, n: 1},
-		&DataPoint{Hr: bpm180, Speed: speed10, Cad: cad180, n: 1},
-		&DataPoint{Hr: bpm180, Speed: speed10, Cad: cad180, n: 1},
+		&DataPoint{Hr: bpm130, Speed: speed10, Cad: cad180, N: 1},
+		&DataPoint{Hr: bpm150, Speed: speed10, Cad: cad180, N: 1},
+		&DataPoint{Hr: bpm150, Speed: speed10, Cad: cad180, N: 1},
+		&DataPoint{Hr: bpm180, Speed: speed10, Cad: cad180, N: 1},
+		&DataPoint{Hr: bpm180, Speed: speed10, Cad: cad180, N: 1},
+		&DataPoint{Hr: bpm180, Speed: speed10, Cad: cad180, N: 1},
 	}
-	input.process()
+	input.Process()
 	return input
 }
 

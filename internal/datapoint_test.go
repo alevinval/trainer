@@ -15,14 +15,14 @@ var (
 			Cad:   Cadence(100),
 			Speed: Speed(10),
 			Perf:  Performance(5),
-			n:     1,
+			N:     1,
 		},
 		{
 			Hr:    HeartRate(50),
 			Cad:   Cadence(50),
 			Speed: Speed(5),
 			Perf:  Performance(2.5),
-			n:     2,
+			N:     2,
 		},
 	}
 )

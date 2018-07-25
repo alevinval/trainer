@@ -9,6 +9,7 @@ import (
 
 	"github.com/alevinval/trainer/internal"
 	"github.com/alevinval/trainer/internal/enrichers"
+	"github.com/alevinval/trainer/pkg/providers"
 )
 
 func findActivities(lookupPath string) (activities trainer.ActivityList, err error) {
@@ -117,7 +118,7 @@ func getActivitiesFromPaths(paths []string) (list trainer.ActivityList) {
 func loadActivityWorker(wg *sync.WaitGroup, paths <-chan string, activities chan<- *trainer.Activity) {
 	for path := range paths {
 		defer wg.Done()
-		activity, err := trainer.OpenFile(path)
+		activity, err := providers.OpenFile(path)
 		if err != nil {
 			log.Printf("cannot open file %q: %s\n", path, err)
 			continue
