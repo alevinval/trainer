@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/alevinval/trainer/internal"
+	"github.com/alevinval/trainer/internal/trainer"
 	"github.com/spf13/cobra"
 )
 

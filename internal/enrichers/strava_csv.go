@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/alevinval/trainer/internal"
+	"github.com/alevinval/trainer/internal/trainer"
 )
 
 type stravaCsvEnricher struct {

@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"time"
 
-	trainer "github.com/alevinval/trainer/internal"
+	"github.com/alevinval/trainer/internal/trainer"
 )
 
 type (

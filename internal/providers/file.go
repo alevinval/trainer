@@ -9,8 +9,8 @@ import (
 	"path"
 	"strings"
 
-	trainer "github.com/alevinval/trainer/internal"
-	"github.com/alevinval/trainer/pkg/providers/adapters"
+	"github.com/alevinval/trainer/internal/providers/adapters"
+	"github.com/alevinval/trainer/internal/trainer"
 )
 
 const (

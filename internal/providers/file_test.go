@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alevinval/trainer/internal"
+	"github.com/alevinval/trainer/internal/trainer"
 	"github.com/stretchr/testify/assert"
 )
 
