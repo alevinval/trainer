@@ -1,4 +1,4 @@
-package adapters
+package adapter
 
 import (
 	"encoding/xml"
@@ -26,9 +26,9 @@ type (
 	}
 )
 
-// NewGpxAdapter returns an adapter that converts gpx files
+// Gpx returns an adapter that converts gpx files
 // into trainer primitives.
-func NewGpxAdapter(b []byte) (g *GpxAdapter, err error) {
+func Gpx(b []byte) (g *GpxAdapter, err error) {
 	g = &GpxAdapter{}
 	err = xml.Unmarshal(b, g)
 	return

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/alevinval/trainer/internal/enrichers"
-	"github.com/alevinval/trainer/internal/providers"
+	"github.com/alevinval/trainer/internal/enricher"
+	"github.com/alevinval/trainer/internal/provider"
 	"github.com/alevinval/trainer/internal/trainer"
 )
 
@@ -118,7 +118,7 @@ func getActivitiesFromPaths(paths []string) (list trainer.ActivityList) {
 func loadActivityWorker(wg *sync.WaitGroup, paths <-chan string, activities chan<- *trainer.Activity) {
 	for path := range paths {
 		defer wg.Done()
-		activity, err := providers.OpenFile(path)
+		activity, err := provider.OpenFile(path)
 		if err != nil {
 			log.Printf("cannot open file %q: %s\n", path, err)
 			continue
@@ -140,7 +140,7 @@ func findPaths(root string) (filePaths []string, err error) {
 }
 
 func applyStravaEnricher(activities trainer.ActivityList) (err error) {
-	stravaEnricher, err := enrichers.NewStravaCsvEnricher(stravaCsvEnrichPath)
+	stravaEnricher, err := enricher.StravaCsv(stravaCsvEnrichPath)
 	if err != nil {
 		return err
 	}

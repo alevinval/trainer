@@ -1,4 +1,4 @@
-package adapters
+package adapter
 
 import (
 	"bytes"
@@ -14,9 +14,9 @@ type FitAdapter struct {
 	file *fit.File
 }
 
-// NewFitAdapter returns an adapter that converts fit files
+// Fit returns an adapter that converts fit files
 // into trainer primitives.
-func NewFitAdapter(b []byte) (adapter *FitAdapter, err error) {
+func Fit(b []byte) (adapter *FitAdapter, err error) {
 	buffer := bytes.NewBuffer(b)
 	adapter = &FitAdapter{}
 	adapter.file, err = fit.Decode(buffer)

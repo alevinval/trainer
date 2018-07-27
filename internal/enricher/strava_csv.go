@@ -1,4 +1,4 @@
-package enrichers
+package enricher
 
 import (
 	"encoding/csv"
@@ -14,13 +14,14 @@ type stravaCsvEnricher struct {
 	fileNameToActivityName map[string]string
 }
 
-// NewStravaCsvEnricher returns an enricher of activites
+// StravaCsv returns an enricher of activites
 // using strava dumps metadata.
-func NewStravaCsvEnricher(filePath string) (trainer.Enricher, error) {
+func StravaCsv(filePath string) (trainer.Enricher, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 
 	r := csv.NewReader(file)
 	records, err := r.ReadAll()

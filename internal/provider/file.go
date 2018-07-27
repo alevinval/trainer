@@ -1,4 +1,4 @@
-package providers
+package provider
 
 import (
 	"compress/gzip"
@@ -9,7 +9,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/alevinval/trainer/internal/providers/adapters"
+	"github.com/alevinval/trainer/internal/adapter"
 	"github.com/alevinval/trainer/internal/trainer"
 )
 
@@ -80,9 +80,9 @@ func getFileExt(fileName string) (ext fileExt, isGzip bool, err error) {
 func getFileActivityProvider(ext fileExt, data []byte) (p trainer.ActivityProvider, err error) {
 	switch ext {
 	case extGpx:
-		p, err = adapters.NewGpxAdapter(data)
+		p, err = adapter.Gpx(data)
 	case extFit:
-		p, err = adapters.NewFitAdapter(data)
+		p, err = adapter.Fit(data)
 	}
 	return
 }
