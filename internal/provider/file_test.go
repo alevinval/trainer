@@ -1,37 +1,16 @@
 package provider
 
 import (
-	"bytes"
-	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"os"
 	"path"
 	"strings"
 	"testing"
 
+	"github.com/alevinval/trainer/internal/testutil"
 	"github.com/alevinval/trainer/internal/trainer"
 	"github.com/stretchr/testify/assert"
 )
-
-func createTmpFile(t *testing.T, path string, data []byte) {
-	err := ioutil.WriteFile(path, data, 0644)
-	if err != nil {
-		t.Fatalf("error writing file: %s", err)
-	}
-}
-
-func createGzipTmpFile(t *testing.T, path string, data []byte) {
-	var b bytes.Buffer
-	w := gzip.NewWriter(&b)
-	_, err := w.Write(data)
-	if err != nil {
-		t.Fatalf("error writing gzip file: %s", err)
-	}
-	w.Close()
-	createTmpFile(t, path, b.Bytes())
-}
 
 func createGpxActivityAsText() string {
 	trackpoint := func(lat, lon float64) string {
@@ -70,11 +49,8 @@ func createGpxActivityAsText() string {
 }
 
 func TestOpenFile(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "trainer-activities-test")
-	if err != nil {
-		t.Fatalf("error creating temporary directory: %s", err)
-	}
-	defer os.RemoveAll(tmpDir)
+	tmp := testutil.NewTemp()
+	defer tmp.Remove()
 
 	for _, test := range []struct {
 		fileName      string
@@ -94,11 +70,12 @@ func TestOpenFile(t *testing.T) {
 		{"right-file-1.gpx", createGpxActivityAsText(), nil, 3},
 		{"right-file-2-compressed.gpx.gz", createGpxActivityAsText(), nil, 3},
 	} {
-		filePath := path.Join(tmpDir, test.fileName)
-		if path.Ext(filePath) == ".gz" {
-			createGzipTmpFile(t, filePath, []byte(test.data))
+		data := []byte(test.data)
+		var filePath string
+		if path.Ext(test.fileName) == ".gz" {
+			filePath = tmp.CreateGzip(test.fileName, data)
 		} else {
-			createTmpFile(t, filePath, []byte(test.data))
+			filePath = tmp.Create(test.fileName, data)
 		}
 
 		activity, err := OpenFile(filePath)

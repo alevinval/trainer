@@ -1,21 +1,13 @@
 package enricher
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
 
+	"github.com/alevinval/trainer/internal/testutil"
 	"github.com/alevinval/trainer/internal/trainer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func createTmpFile(t *testing.T, path string, data []byte) {
-	err := ioutil.WriteFile(path, data, 0644)
-	if err != nil {
-		t.Fatalf("error writing file: %s", err)
-	}
-}
 
 func TestStravaCsvEnrichFailOpen(t *testing.T) {
 	_, err := StravaCsv("testdata/missing-file.csv")
@@ -23,11 +15,11 @@ func TestStravaCsvEnrichFailOpen(t *testing.T) {
 }
 
 func TestStravaCsvEnrichFailCsvParse(t *testing.T) {
-	defer os.Remove("enrich.csv")
+	tmp := testutil.NewTemp()
+	filePath := tmp.Create("enrich.csv", []byte("a\n,,\n"))
+	defer tmp.Remove()
 
-	createTmpFile(t, "enrich.csv", []byte("a\n,,\n"))
-
-	_, err := StravaCsv("enrich.csv")
+	_, err := StravaCsv(filePath)
 	require.NotNil(t, err)
 
 	assert.Equal(t, "record on line 2: wrong number of fields", err.Error())
