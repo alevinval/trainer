@@ -17,5 +17,5 @@ If you name your activities in a consistent way, this tool allows you to filter 
 performance between activities of the same kind (i.e compare evolution of performance on long-runs only)
 
 Ideally I would like Garmin to let me securely connect to their API
-and synchronize the files this way. Sadly Garmin wants you to pay a one time 4.000$ fee
+and synchronize the files this way. Sadly Garmin wants you to pay a one time ~4.000$~ 5.000$ fee
 to get access to their API.
