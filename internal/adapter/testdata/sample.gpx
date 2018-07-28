@@ -24,9 +24,9 @@
 					</ns3:TrackPointExtension>
 				</extensions>
 			</trkpt>
-			<trkpt lat="2.000000" lon="2.000000">
+			<trkpt lat="1.000001" lon="1.000001">
 				<ele>100.000000</ele>
-				<time>2017-06-19T16:49:35.000Z</time>
+				<time>2017-06-19T16:49:40.000Z</time>
 				<extensions>
 					<ns3:TrackPointExtension>
 						<ns3:hr>94</ns3:hr>
@@ -34,9 +34,9 @@
 					</ns3:TrackPointExtension>
 				</extensions>
 			</trkpt>
-			<trkpt lat="3.000000" lon="3.000000">
+			<trkpt lat="1.000002" lon="1.000002">
 				<ele>100.000000</ele>
-				<time>2017-06-19T16:49:35.000Z</time>
+				<time>2017-06-19T16:49:45.000Z</time>
 				<extensions>
 					<ns3:TrackPointExtension>
 						<ns3:hr>94</ns3:hr>
