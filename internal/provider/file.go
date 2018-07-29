@@ -13,81 +13,72 @@ import (
 	"github.com/alevinval/trainer/internal/trainer"
 )
 
-const (
-	extGpx fileExt = ".gpx"
-	extFit fileExt = ".fit"
+type (
+	adapterConstructor func(data []byte) (provider trainer.ActivityProvider, err error)
 )
 
 var (
-	// ErrUnknownExtension is returned when the file extension is not recognized.
-	ErrUnknownExtension = errors.New("unrecognized file extension")
+	// ErrExtensionNotSupported is returned when the file extension is not supported
+	ErrExtensionNotSupported = errors.New("unrecognized file extension")
+
+	extToAdapter = map[string]adapterConstructor{
+		".gpx": adapter.Gpx,
+		".fit": adapter.Fit,
+	}
 )
 
-type (
-	fileExt string
-)
-
-// OpenFile reads a file content and returns an Activity.
-func OpenFile(fileName string) (a *trainer.Activity, err error) {
-	ext, isGzip, err := getFileExt(fileName)
+// File reads a file content and returns an Activity.
+func File(name string) (actvity *trainer.Activity, err error) {
+	ext, isGzip := isGzip(name)
+	if !isExtSupported(ext) {
+		return nil, ErrExtensionNotSupported
+	}
+	r, err := getReaderForFile(name, isGzip)
 	if err != nil {
 		return nil, err
 	}
-	data, err := getFileContents(fileName, isGzip)
+	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
-	provider, err := getFileActivityProvider(ext, data)
+	provider, err := extToAdapter[ext](data)
 	if err != nil {
 		return nil, err
 	}
-	return buildActivityFromFile(fileName, provider, data), nil
+	return buildActivity(provider, data, name), nil
 }
 
-func getFileContents(name string, isGzip bool) (b []byte, err error) {
-	var src io.Reader
+// isGzip returns the extension of a file and whether its zipped or not.
+func isGzip(name string) (ext string, isGzip bool) {
+	if strings.HasSuffix(name, ".gz") {
+		nameWithoutGz := strings.TrimSuffix(name, ".gz")
+		ext := path.Ext(nameWithoutGz)
+		return ext, true
+	}
+	return path.Ext(name), false
+}
 
-	src, err = os.Open(name)
+// isExtSupported returns if an adapter exists for the given extension.
+func isExtSupported(ext string) (supported bool) {
+	_, ok := extToAdapter[ext]
+	return ok
+}
+
+// getReaderForFile returns a reader for a file, supports zipped files.
+func getReaderForFile(name string, isGzip bool) (r io.Reader, err error) {
+	r, err = os.Open(name)
 	if err != nil {
 		return nil, err
 	}
-	if isGzip {
-		src, err = gzip.NewReader(src)
-		if err != nil {
-			return nil, err
-		}
+	if !isGzip {
+		return r, err
 	}
-	return ioutil.ReadAll(src)
+	return gzip.NewReader(r)
 }
 
-func getFileExt(fileName string) (ext fileExt, isGzip bool, err error) {
-	extStr := path.Ext(fileName)
-	if extStr == ".gz" {
-		extStr = path.Ext(strings.TrimSuffix(fileName, ".gz"))
-		isGzip = true
-	}
-	switch fileExt(extStr) {
-	case extGpx:
-		ext = extGpx
-	case extFit:
-		ext = extFit
-	default:
-		err = ErrUnknownExtension
-	}
-	return
-}
-
-func getFileActivityProvider(ext fileExt, data []byte) (p trainer.ActivityProvider, err error) {
-	switch ext {
-	case extGpx:
-		p, err = adapter.Gpx(data)
-	case extFit:
-		p, err = adapter.Fit(data)
-	}
-	return
-}
-
-func buildActivityFromFile(fileName string, provider trainer.ActivityProvider, data []byte) *trainer.Activity {
+// buildActivity returns an activity with metadata reflecting the source
+// of the activity.
+func buildActivity(provider trainer.ActivityProvider, data []byte, fileName string) *trainer.Activity {
 	metadata := provider.Metadata()
 	metadata.DataSource = trainer.DataSource{
 		Type: trainer.FileDataSource,

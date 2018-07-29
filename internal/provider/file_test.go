@@ -25,9 +25,9 @@ func TestOpenFile(t *testing.T) {
 		err           error
 		dataPointsLen int
 	}{
-		{"wrong-extension-1", "", ErrUnknownExtension, 0},
-		{"wrong-extension-2.tmp", "", ErrUnknownExtension, 0},
-		{"wrong-extension-3.gpx.txt", "", ErrUnknownExtension, 0},
+		{"wrong-extension-1", "", ErrExtensionNotSupported, 0},
+		{"wrong-extension-2.tmp", "", ErrExtensionNotSupported, 0},
+		{"wrong-extension-3.gpx.txt", "", ErrExtensionNotSupported, 0},
 
 		{"right-extension-no-data.gpx", "", io.EOF, 0},
 		{"right-extension-invalid-data.gpx", "invalid blob", io.EOF, 0},
@@ -45,7 +45,7 @@ func TestOpenFile(t *testing.T) {
 			filePath = tmp.Create(test.fileName, data)
 		}
 
-		activity, err := OpenFile(filePath)
+		activity, err := File(filePath)
 		require.Equal(t, test.err, err)
 
 		// Assert data source is populated correctly
@@ -61,6 +61,6 @@ func TestOpenFile(t *testing.T) {
 }
 
 func TestOpenFileWithMissingFile(t *testing.T) {
-	_, err := OpenFile("some-path.gpx")
+	_, err := File("some-path.gpx")
 	assert.NotNil(t, err)
 }

@@ -118,7 +118,7 @@ func getActivitiesFromPaths(paths []string) (list trainer.ActivityList) {
 func loadActivityWorker(wg *sync.WaitGroup, paths <-chan string, activities chan<- *trainer.Activity) {
 	for path := range paths {
 		defer wg.Done()
-		activity, err := provider.OpenFile(path)
+		activity, err := provider.File(path)
 		if err != nil {
 			log.Printf("cannot open file %q: %s\n", path, err)
 			continue
