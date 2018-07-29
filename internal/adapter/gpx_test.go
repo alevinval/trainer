@@ -40,3 +40,10 @@ func TestReadGpx(t *testing.T) {
 	}
 	assert.Equal(t, expected, g.DataPoints()[1])
 }
+
+func TestReadInvalidGpx(t *testing.T) {
+	data := []byte("invalid gpx data")
+
+	_, err := Gpx(data)
+	assert.NotNil(t, err)
+}

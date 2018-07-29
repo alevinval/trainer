@@ -8,15 +8,15 @@ import (
 )
 
 type (
-	// GpxAdapter maps to a GPX activity file
-	GpxAdapter struct {
+	// gpxAdapter maps to a GPX activity file
+	gpxAdapter struct {
 		Time        time.Time       `xml:"metadata>time"`
 		Name        string          `xml:"trk>name"`
-		TrackPoints []GpxTrackPoint `xml:"trk>trkseg>trkpt"`
+		TrackPoints []gpxTrackPoint `xml:"trk>trkseg>trkpt"`
 	}
 
-	// GpxTrackPoint maps to a GPX file trackpoint
-	GpxTrackPoint struct {
+	// gpxTrackPoint maps to a GPX file trackpoint
+	gpxTrackPoint struct {
 		Time time.Time `xml:"time"`
 		Lat  float64   `xml:"lat,attr"`
 		Lon  float64   `xml:"lon,attr"`
@@ -28,26 +28,26 @@ type (
 
 // Gpx returns an adapter that converts gpx files
 // into trainer primitives.
-func Gpx(b []byte) (g *GpxAdapter, err error) {
-	g = &GpxAdapter{}
+func Gpx(b []byte) (provider trainer.ActivityProvider, err error) {
+	g := &gpxAdapter{}
 	err = xml.Unmarshal(b, g)
-	return
+	return g, err
 }
 
 // Metadata implements trainer.MetadataProvider interface.
 // It creates a metadata object with known information of the gpx file:
 // The activity name and time it was carried on.
-func (g *GpxAdapter) Metadata() (meta *trainer.Metadata) {
+func (g *gpxAdapter) Metadata() (meta *trainer.Metadata) {
 	meta = &trainer.Metadata{
 		Name: g.Name,
 		Time: g.Time,
 	}
-	return
+	return meta
 }
 
 // DataPoints implements DatapointProvider interface.
 // It converts a list of gpxTrackPoints to a list of datapoints.
-func (g *GpxAdapter) DataPoints() (list trainer.DataPointList) {
+func (g *gpxAdapter) DataPoints() (list trainer.DataPointList) {
 	list = make(trainer.DataPointList, len(g.TrackPoints))
 	for i, trackpoint := range g.TrackPoints {
 		list[i] = trackpoint.toDataPoint()
@@ -56,7 +56,7 @@ func (g *GpxAdapter) DataPoints() (list trainer.DataPointList) {
 	return list
 }
 
-func (tp *GpxTrackPoint) toDataPoint() (dp *trainer.DataPoint) {
+func (tp *gpxTrackPoint) toDataPoint() (dp *trainer.DataPoint) {
 	dp = &trainer.DataPoint{
 		Time: tp.Time,
 		Coords: trainer.Point{

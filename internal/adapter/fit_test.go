@@ -8,6 +8,7 @@ import (
 	"github.com/alevinval/trainer/internal/trainer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/tormoder/fit"
 )
 
 func TestReadFit(t *testing.T) {
@@ -39,4 +40,23 @@ func TestReadFit(t *testing.T) {
 		N:     1,
 	}
 	assert.Equal(t, expected, f.DataPoints()[50])
+}
+
+func TestReadInvalidFit(t *testing.T) {
+	data := []byte("invalid fit data")
+
+	_, err := Fit(data)
+
+	assert.NotNil(t, err)
+}
+
+func TestReadNotActivity(t *testing.T) {
+	data, err := ioutil.ReadFile("testdata/sample.fit")
+	require.Nil(t, err)
+
+	f, err := Fit(data)
+	require.Nil(t, err)
+	f.(*fitAdapter).file.FileId.Type = fit.FileTypeDevice
+
+	assert.Equal(t, 0, len(f.DataPoints()))
 }
