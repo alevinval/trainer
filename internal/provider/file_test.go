@@ -16,7 +16,10 @@ func TestOpenFile(t *testing.T) {
 	tmp := testutil.NewTemp()
 	defer tmp.Remove()
 
-	sampleGpx, err := ioutil.ReadFile("testdata/sample.gpx")
+	sampleGpx, err := ioutil.ReadFile("../adapter/testdata/sample.gpx")
+	require.Nil(t, err)
+
+	sampleFit, err := ioutil.ReadFile("../adapter/testdata/sample.fit")
 	require.Nil(t, err)
 
 	for _, test := range []struct {
@@ -36,6 +39,8 @@ func TestOpenFile(t *testing.T) {
 
 		{"right-file-1.gpx", string(sampleGpx), nil, 3},
 		{"right-file-2-compressed.gpx.gz", string(sampleGpx), nil, 3},
+		{"right-file-1.fit", string(sampleFit), nil, 260},
+		{"right-file-2-compressed.fit.gz", string(sampleFit), nil, 260},
 	} {
 		data := []byte(test.data)
 		var filePath string
