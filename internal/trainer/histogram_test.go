@@ -1,6 +1,7 @@
 package trainer
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,7 +31,7 @@ func getTestInputDataPoints() DataPointList {
 func TestHistogramFeed(t *testing.T) {
 	input := getTestInputDataPoints()
 	histogram := input.GetHistogram()
-	for _, test := range []struct {
+	for _, tt := range []struct {
 		hr    HeartRate
 		count int
 	}{
@@ -38,8 +39,10 @@ func TestHistogramFeed(t *testing.T) {
 		{bpm150, 2},
 		{bpm180, 3},
 	} {
-		list := histogram.Data()[test.hr]
-		assert.Equal(t, test.count, len(list))
+		t.Run(fmt.Sprintf("number of datapoints at %s", tt.hr), func(t *testing.T) {
+			list := histogram.Data()[tt.hr]
+			assert.Equal(t, tt.count, len(list))
+		})
 	}
 }
 

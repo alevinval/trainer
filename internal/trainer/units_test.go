@@ -13,7 +13,7 @@ const (
 )
 
 func TestUnitsToString(t *testing.T) {
-	for _, test := range []struct {
+	for _, tt := range []struct {
 		unit     fmt.Stringer
 		expected string
 	}{
@@ -27,7 +27,9 @@ func TestUnitsToString(t *testing.T) {
 		{unit: Distance(0.123), expected: "0.12 m"},
 		{unit: Elevation(123.3), expected: "123.3m"},
 	} {
-		assert.Equal(t, test.expected, test.unit.String())
+		t.Run(fmt.Sprintf("%T to string", tt.unit), func(t *testing.T) {
+			assert.Equal(t, tt.expected, tt.unit.String())
+		})
 	}
 }
 
