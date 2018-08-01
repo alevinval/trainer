@@ -3,7 +3,7 @@
 all: update test vet build
 
 build:
-	go build -a ./cmd/trainer
+	go build -a -o bin/trainer ./cmd/trainer
 	
 test:
 	go test ./...

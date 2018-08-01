@@ -1,2 +1,2 @@
-trainer
-trainer.exe
+bin/
+*.exe
