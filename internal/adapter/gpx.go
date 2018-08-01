@@ -13,6 +13,9 @@ type (
 		Time        time.Time       `xml:"metadata>time"`
 		Name        string          `xml:"trk>name"`
 		TrackPoints []gpxTrackPoint `xml:"trk>trkseg>trkpt"`
+
+		metadata   *trainer.Metadata
+		datapoints trainer.DataPointList
 	}
 
 	// gpxTrackPoint maps to a GPX file trackpoint
@@ -31,6 +34,12 @@ type (
 func Gpx(b []byte) (provider trainer.ActivityProvider, err error) {
 	g := &gpxAdapter{}
 	err = xml.Unmarshal(b, g)
+	if err != nil {
+		return nil, err
+	}
+
+	g.metadata = g.makeMetadata()
+	g.datapoints = g.makeDataPoints()
 	return g, err
 }
 
@@ -38,16 +47,23 @@ func Gpx(b []byte) (provider trainer.ActivityProvider, err error) {
 // It creates a metadata object with known information of the gpx file:
 // The activity name and time it was carried on.
 func (g *gpxAdapter) Metadata() (meta *trainer.Metadata) {
-	meta = &trainer.Metadata{
-		Name: g.Name,
-		Time: g.Time,
-	}
-	return meta
+	return g.metadata
 }
 
 // DataPoints implements DatapointProvider interface.
 // It converts a list of gpxTrackPoints to a list of datapoints.
 func (g *gpxAdapter) DataPoints() (list trainer.DataPointList) {
+	return g.datapoints
+}
+
+func (g *gpxAdapter) makeMetadata() (metadata *trainer.Metadata) {
+	return &trainer.Metadata{
+		Name: g.Name,
+		Time: g.Time,
+	}
+}
+
+func (g *gpxAdapter) makeDataPoints() (list trainer.DataPointList) {
 	list = make(trainer.DataPointList, len(g.TrackPoints))
 	for i, trackpoint := range g.TrackPoints {
 		list[i] = trackpoint.toDataPoint()

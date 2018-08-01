@@ -2,7 +2,7 @@ package trainer
 
 // Enricher interface allows custom logic to enrich activities data.
 type Enricher interface {
-	Enrich(a *Activity) (err error)
+	Enrich(provider ActivityProvider) (err error)
 }
 
 // EnrichActivities applies enrichers to a list of activities.

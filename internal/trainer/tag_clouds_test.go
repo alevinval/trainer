@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func provideActivityWithName(name string) *Activity {
-	return &Activity{
-		metadata: &Metadata{
+func provideActivityWithName(name string) ActivityProvider {
+	return &MockActivity{
+		MockMetadata: &Metadata{
 			Name: name,
 		},
 	}

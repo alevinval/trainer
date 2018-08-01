@@ -30,28 +30,28 @@ func findActivities(lookupPath string) (activities trainer.ActivityList, err err
 	}
 
 	if filterByDate != "" {
-		activities = activities.Filter(func(a *trainer.Activity) bool {
+		activities = activities.Filter(func(a trainer.ActivityProvider) bool {
 			date := a.Metadata().Time.Format("20060102")
 			return strings.HasPrefix(date, filterByDate)
 		})
 	}
 
 	if filterByDateFrom != "" {
-		activities = activities.Filter(func(a *trainer.Activity) bool {
+		activities = activities.Filter(func(a trainer.ActivityProvider) bool {
 			date := a.Metadata().Time.Format("20060102")
 			return date[0:len(filterByDateFrom)] >= filterByDateFrom
 		})
 	}
 
 	if filterByDateTo != "" {
-		activities = activities.Filter(func(a *trainer.Activity) bool {
+		activities = activities.Filter(func(a trainer.ActivityProvider) bool {
 			date := a.Metadata().Time.Format("20060102")
 			return date[0:len(filterByDateTo)] < filterByDateTo
 		})
 	}
 
 	if filterByName != "" {
-		activities = activities.Filter(func(a *trainer.Activity) bool {
+		activities = activities.Filter(func(a trainer.ActivityProvider) bool {
 			cloud := trainer.TagCloudFromActivities(trainer.ActivityList{a})
 			return cloud.Contains(filterByName)
 		})
@@ -99,7 +99,7 @@ func getActivitiesFromPaths(paths []string) (list trainer.ActivityList) {
 	}
 	close(inputCh)
 
-	activitiesCh := make(chan *trainer.Activity, len(paths))
+	activitiesCh := make(chan trainer.ActivityProvider, len(paths))
 
 	maxParallelOpen := 10
 	for w := 0; w < maxParallelOpen; w++ {
@@ -115,15 +115,15 @@ func getActivitiesFromPaths(paths []string) (list trainer.ActivityList) {
 	return
 }
 
-func loadActivityWorker(wg *sync.WaitGroup, paths <-chan string, activities chan<- *trainer.Activity) {
+func loadActivityWorker(wg *sync.WaitGroup, paths <-chan string, activities chan<- trainer.ActivityProvider) {
 	for path := range paths {
 		defer wg.Done()
-		activity, err := provider.File(path)
+		provider, err := provider.File(path)
 		if err != nil {
 			log.Printf("cannot open file %q: %s\n", path, err)
 			continue
 		}
-		activities <- activity
+		activities <- provider
 	}
 }
 

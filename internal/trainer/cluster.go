@@ -11,7 +11,7 @@ import (
 // threshold between them.
 var DistanceCriteria = func(distance float64) clusteringCriteria {
 	d := Distance(distance)
-	return func(c *Cluster, a *Activity) bool {
+	return func(c *Cluster, a ActivityProvider) bool {
 		startingPoint := a.DataPoints()[0].Coords
 		return startingPoint.DistanceTo(c.Coords) < d
 	}
@@ -28,7 +28,7 @@ type (
 	// ClusterList is a list of clusters.
 	ClusterList []*Cluster
 
-	clusteringCriteria func(*Cluster, *Activity) bool
+	clusteringCriteria func(*Cluster, ActivityProvider) bool
 )
 
 // GetClusters clusters a list of activities that match a certain criteria.
@@ -55,7 +55,7 @@ func GetClusters(activities ActivityList, criteria clusteringCriteria) ClusterLi
 	return clusters
 }
 
-func getMatchingCluster(clusters ClusterList, candidate *Activity, criteria clusteringCriteria) (*Cluster, error) {
+func getMatchingCluster(clusters ClusterList, candidate ActivityProvider, criteria clusteringCriteria) (*Cluster, error) {
 	for _, cluster := range clusters {
 		if criteria(cluster, candidate) {
 			return cluster, nil

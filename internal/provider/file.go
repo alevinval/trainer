@@ -27,8 +27,8 @@ var (
 	}
 )
 
-// File reads a file content and returns an Activity.
-func File(name string) (actvity *trainer.Activity, err error) {
+// File reads a file content and returns an ActivityProvider
+func File(name string) (provider trainer.ActivityProvider, err error) {
 	ext, isGzip := isGzip(name)
 	if !isExtSupported(ext) {
 		return nil, ErrExtensionNotSupported
@@ -41,11 +41,15 @@ func File(name string) (actvity *trainer.Activity, err error) {
 	if err != nil {
 		return nil, err
 	}
-	provider, err := extToAdapter[ext](data)
+	provider, err = extToAdapter[ext](data)
 	if err != nil {
 		return nil, err
 	}
-	return buildActivity(provider, data, name), nil
+	provider.Metadata().DataSource = trainer.DataSource{
+		Type: trainer.FileDataSource,
+		Name: name,
+	}
+	return provider, nil
 }
 
 // isGzip returns the extension of a file and whether its zipped or not.
@@ -74,16 +78,4 @@ func getReaderForFile(name string, isGzip bool) (r io.Reader, err error) {
 		return r, err
 	}
 	return gzip.NewReader(r)
-}
-
-// buildActivity returns an activity with metadata reflecting the source
-// of the activity.
-func buildActivity(provider trainer.ActivityProvider, data []byte, fileName string) *trainer.Activity {
-	metadata := provider.Metadata()
-	metadata.DataSource = trainer.DataSource{
-		Type: trainer.FileDataSource,
-		Name: fileName,
-	}
-	datapoints := provider.DataPoints()
-	return trainer.NewActivity(data, metadata, datapoints)
 }

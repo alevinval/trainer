@@ -46,8 +46,8 @@ func (e *stravaCsvEnricher) buildActivityNameMap(records [][]string) {
 	}
 }
 
-func (e *stravaCsvEnricher) Enrich(a *trainer.Activity) (err error) {
-	m := a.Metadata()
+func (e *stravaCsvEnricher) Enrich(provider trainer.ActivityProvider) (err error) {
+	m := provider.Metadata()
 
 	// Only enrich activities coming from files.
 	if m.DataSource.Type != trainer.FileDataSource {
@@ -59,7 +59,7 @@ func (e *stravaCsvEnricher) Enrich(a *trainer.Activity) (err error) {
 	fileName := path.Base(m.DataSource.Name)
 	activityName, hasName := e.fileNameToActivityName[fileName]
 	if hasName {
-		a.Metadata().Name = activityName
+		m.Name = activityName
 	}
 
 	return

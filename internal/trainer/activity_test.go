@@ -7,11 +7,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type MockActivity struct {
+	MockMetadata   *Metadata
+	MockDataPoints DataPointList
+}
+
+func (ma *MockActivity) Metadata() *Metadata {
+	if ma.MockMetadata != nil {
+		return ma.MockMetadata
+	}
+	return &Metadata{}
+}
+
+func (ma *MockActivity) DataPoints() DataPointList {
+	if ma.MockDataPoints != nil {
+		return ma.MockDataPoints
+	}
+	return DataPointList{}
+}
+
 func createActivityListWithTimes(times ...time.Time) ActivityList {
 	list := ActivityList{}
 	for _, t := range times {
-		activity := &Activity{
-			metadata: &Metadata{
+		activity := &MockActivity{
+			MockMetadata: &Metadata{
 				Time: t,
 			},
 		}
@@ -25,9 +44,9 @@ func TestActivityListSortByTime(t *testing.T) {
 	oldest := time.Unix(1, 0)
 	list := createActivityListWithTimes(earliest, oldest)
 
-	assert.Equal(t, earliest, list[0].metadata.Time)
+	assert.Equal(t, earliest, list[0].Metadata().Time)
 	list.SortByTime()
-	assert.Equal(t, oldest, list[0].metadata.Time)
+	assert.Equal(t, oldest, list[0].Metadata().Time)
 }
 
 func TestActivityListChunkByDurationSplit(t *testing.T) {

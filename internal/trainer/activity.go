@@ -14,46 +14,17 @@ type (
 		Metadata() *Metadata
 	}
 
+	// ActivityProvider is the main domain object, it contains metadata about
+	// your activity and the normalised datapoints with processed information
+	// such as speed, performance, etc...
 	ActivityProvider interface {
 		MetadataProvider
 		DataPointProvider
 	}
 
-	// Activity is the main domain object, it contains metadata about
-	// your activity and the normalised datapoints with processed information
-	// such as speed, performance, etc...
-	Activity struct {
-		rawData    []byte
-		metadata   *Metadata
-		datapoints DataPointList
-	}
-
 	// ActivityList is a list of activities.
-	ActivityList []*Activity
+	ActivityList []ActivityProvider
 )
-
-func NewActivity(data []byte, metadata *Metadata, datapoints DataPointList) *Activity {
-	return &Activity{
-		rawData:    data,
-		metadata:   metadata,
-		datapoints: datapoints,
-	}
-}
-
-// Metadata implements metadataProvider interface.
-func (a *Activity) Metadata() *Metadata {
-	return a.metadata
-}
-
-// SetMetadata sets the metadata object to the provided one.
-func (a *Activity) SetMetadata(newMetadata *Metadata) {
-	a.metadata = newMetadata
-}
-
-// DataPoints implements datapointProvider interface.
-func (a *Activity) DataPoints() DataPointList {
-	return a.datapoints
-}
 
 // DataPoints implements datapointProvider interface.
 func (list ActivityList) DataPoints() DataPointList {
@@ -65,7 +36,7 @@ func (list ActivityList) DataPoints() DataPointList {
 }
 
 // Filter returns a list of activities that pass the filter function.
-func (list ActivityList) Filter(filterFn func(a *Activity) bool) ActivityList {
+func (list ActivityList) Filter(filterFn func(a ActivityProvider) bool) ActivityList {
 	var filtered ActivityList
 	for _, activity := range list {
 		if filterFn(activity) {
@@ -79,7 +50,7 @@ func (list ActivityList) Filter(filterFn func(a *Activity) bool) ActivityList {
 // from oldest to newest.
 func (list ActivityList) SortByTime() {
 	sort.Slice(list, func(i, j int) bool {
-		return list[i].metadata.Time.Before(list[j].metadata.Time)
+		return list[i].Metadata().Time.Before(list[j].Metadata().Time)
 	})
 }
 
@@ -91,11 +62,11 @@ func (list ActivityList) ChunkByDuration(d time.Duration) []ActivityList {
 	}
 
 	first := list[0]
-	chunk, chunkTime := ActivityList{first}, first.metadata.Time
+	chunk, chunkTime := ActivityList{first}, first.Metadata().Time
 	for _, a := range list[1:] {
-		if a.metadata.Time.Sub(chunkTime) >= d {
+		if a.Metadata().Time.Sub(chunkTime) >= d {
 			chunks = append(chunks, chunk)
-			chunk, chunkTime = ActivityList{a}, a.metadata.Time
+			chunk, chunkTime = ActivityList{a}, a.Metadata().Time
 			continue
 		}
 		chunk = append(chunk, a)
