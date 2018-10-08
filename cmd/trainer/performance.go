@@ -32,6 +32,7 @@ func doPerformanceCommand(path string) error {
 	activities, err := findActivities(path)
 	if err != nil {
 		log.Printf("performance command failed: %s", err)
+		return err
 	}
 
 	histogram := activities.DataPoints().GetHistogram()

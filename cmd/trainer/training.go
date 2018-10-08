@@ -41,10 +41,11 @@ func getTrainingWindowDuration() time.Duration {
 	return weekWindow
 }
 
-func doTraining(path string) {
+func doTraining(path string) error {
 	activities, err := findActivities(path)
 	if err != nil {
 		log.Printf("training command failed: %s", err)
+		return err
 	}
 	window := getTrainingWindowDuration()
 	chunks := activities.ChunkByDuration(window)
@@ -73,4 +74,5 @@ func doTraining(path string) {
 
 		lastActivity = chunk[len(chunk)-1]
 	}
+	return nil
 }

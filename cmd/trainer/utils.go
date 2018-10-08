@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path"
@@ -55,6 +56,10 @@ func findActivities(lookupPath string) (activities trainer.ActivityList, err err
 			cloud := trainer.TagCloudFromActivities(trainer.ActivityList{a})
 			return cloud.Contains(filterByName)
 		})
+	}
+
+	if len(activities) == 0 {
+		return nil, fmt.Errorf("no activities found")
 	}
 
 	activities.SortByTime()
