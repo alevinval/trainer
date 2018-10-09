@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/alevinval/trainer/internal/home"
 	"github.com/alevinval/trainer/internal/trainer"
 )
 
@@ -70,6 +71,10 @@ func Training(activities trainer.ActivityList, timeWindow string) {
 
 		lastActivity = chunk[len(chunk)-1]
 	}
+}
+
+func Sync(lookupPath string) {
+	home.Sync(lookupPath)
 }
 
 func getTrainingWindowDuration(window string) time.Duration {

@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 // Temp holds a temporary directory and provides helper functions
@@ -29,7 +29,7 @@ func NewTemp() *Temp {
 
 // Create file with the specified contents in the temporary folder.
 func (t *Temp) Create(fname string, data []byte) string {
-	fullPath := path.Join(t.tmpDir, fname)
+	fullPath := filepath.Join(t.tmpDir, fname)
 	err := ioutil.WriteFile(fullPath, data, 0644)
 	if err != nil {
 		log.Fatalf("error creating temporary file: %s", err)

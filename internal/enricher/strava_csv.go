@@ -3,7 +3,7 @@ package enricher
 import (
 	"encoding/csv"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/alevinval/trainer/internal/trainer"
 )
@@ -40,7 +40,7 @@ func StravaCsv(filePath string) (trainer.Enricher, error) {
 
 func (e *stravaCsvEnricher) buildActivityNameMap(records [][]string) {
 	for _, columns := range records {
-		fileName := path.Base(columns[e.fileNameCol])
+		fileName := filepath.Base(columns[e.fileNameCol])
 		activityName := columns[e.activityNameCol]
 		e.fileNameToActivityName[fileName] = activityName
 	}
@@ -56,7 +56,7 @@ func (e *stravaCsvEnricher) Enrich(provider trainer.ActivityProvider) (err error
 
 	// See if the strava metadata csv contains activity name
 	// for that file
-	fileName := path.Base(m.DataSource.Name)
+	fileName := filepath.Base(m.DataSource.Name)
 	activityName, hasName := e.fileNameToActivityName[fileName]
 	if hasName {
 		m.Name = activityName

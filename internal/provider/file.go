@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/alevinval/trainer/internal/adapter"
@@ -57,10 +57,10 @@ func isGzip(name string) (ext string, isGzip bool) {
 	name = strings.ToLower(name)
 	if strings.HasSuffix(name, ".gz") {
 		nameWithoutGz := strings.TrimSuffix(name, ".gz")
-		ext := path.Ext(nameWithoutGz)
+		ext := filepath.Ext(nameWithoutGz)
 		return ext, true
 	}
-	return path.Ext(name), false
+	return filepath.Ext(name), false
 }
 
 // isExtSupported returns if an adapter exists for the given extension.

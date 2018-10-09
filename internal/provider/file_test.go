@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -52,7 +52,7 @@ func TestOpenFile(t *testing.T) {
 		t.Run(fmt.Sprintf("Provide from file %s", tt.fileName), func(t *testing.T) {
 			data := []byte(tt.data)
 			var filePath string
-			if strings.ToLower(path.Ext(tt.fileName)) == ".gz" {
+			if strings.ToLower(filepath.Ext(tt.fileName)) == ".gz" {
 				filePath = tmp.CreateGzip(tt.fileName, data)
 			} else {
 				filePath = tmp.Create(tt.fileName, data)
@@ -75,6 +75,6 @@ func TestOpenFile(t *testing.T) {
 }
 
 func TestOpenFileWithMissingFile(t *testing.T) {
-	_, err := File("some-path.gpx")
+	_, err := File("some-filepath.gpx")
 	assert.NotNil(t, err)
 }

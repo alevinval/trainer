@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/alevinval/trainer/internal/enricher"
@@ -93,7 +93,7 @@ func LoadActivityFromArgs(args CmdArgs) (activities trainer.ActivityList, err er
 }
 
 func getPathsWithPrefix(root string, prefix string) (prefixedPaths []string, err error) {
-	prefix = path.Join(root, prefix)
+	prefix = filepath.Join(root, prefix)
 
 	paths, err := findPaths(root)
 	if err != nil {
@@ -120,7 +120,7 @@ func findPaths(root string) (filePaths []string, err error) {
 	}
 	filePaths = make([]string, len(files))
 	for i := range files {
-		filePaths[i] = path.Join(root, files[i].Name())
+		filePaths[i] = filepath.Join(root, files[i].Name())
 	}
 	return
 }
