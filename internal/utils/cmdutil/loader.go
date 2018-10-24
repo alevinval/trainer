@@ -1,4 +1,4 @@
-package main
+package cmdutil
 
 import (
 	"fmt"
@@ -6,55 +6,69 @@ import (
 	"log"
 	"path"
 	"strings"
-	"sync"
 
 	"github.com/alevinval/trainer/internal/enricher"
-	"github.com/alevinval/trainer/internal/provider"
 	"github.com/alevinval/trainer/internal/trainer"
+	"github.com/alevinval/trainer/internal/utils"
 )
 
-func findActivities(lookupPath string) (activities trainer.ActivityList, err error) {
-	paths, err := getPathsWithPrefix(lookupPath, filterByPrefix)
+// CmdArgs wraps together common arguments that commands accept to
+// filter, enrich and select which kinds of activities must be loaded.
+type CmdArgs struct {
+	LookupPath          string
+	StravaCsvEnrichPath string
+	FilterByPrefix      string
+	FilterByName        string
+	FilterByDate        string
+	FilterByDateFrom    string
+	FilterByDateTo      string
+	LogDebug            bool
+	HomePath            string
+}
+
+// LoadActivityFromArgs loads activities applying filters and enrichers as needed.
+func LoadActivityFromArgs(args CmdArgs) (activities trainer.ActivityList, err error) {
+	paths, err := getPathsWithPrefix(args.LookupPath, args.FilterByPrefix)
 	if err != nil {
-		log.Printf("cannot find activities in %s: %s\n", lookupPath, err)
+		log.Printf("cannot find activities in %s: %s\n", args.LookupPath, err)
 		return nil, err
 	}
 
-	activities = getActivitiesFromPaths(paths)
+	activities = utils.ActivitiesFromPaths(paths)
 
-	if stravaCsvEnrichPath != "" {
-		err = applyStravaEnricher(activities)
+	if args.StravaCsvEnrichPath != "" {
+		err = applyStravaEnricher(activities, args.StravaCsvEnrichPath)
 		if err != nil {
 			log.Printf("cannot apply strava csv enricher: %s", err)
 			return
 		}
 	}
 
-	if filterByDate != "" {
+	if args.FilterByDate != "" {
 		activities = activities.Filter(func(a trainer.ActivityProvider) bool {
 			date := a.Metadata().Time.Format("20060102")
-			return strings.HasPrefix(date, filterByDate)
+			return strings.HasPrefix(date, args.FilterByDate)
 		})
 	}
 
-	if filterByDateFrom != "" {
+	if args.FilterByDateFrom != "" {
 		activities = activities.Filter(func(a trainer.ActivityProvider) bool {
 			date := a.Metadata().Time.Format("20060102")
-			return date[0:len(filterByDateFrom)] >= filterByDateFrom
+			return date[0:len(args.FilterByDateFrom)] >= args.FilterByDateFrom
 		})
 	}
 
-	if filterByDateTo != "" {
+	if args.FilterByDateTo != "" {
 		activities = activities.Filter(func(a trainer.ActivityProvider) bool {
 			date := a.Metadata().Time.Format("20060102")
-			return date[0:len(filterByDateTo)] < filterByDateTo
+			return date[0:len(args.FilterByDateTo)] < args.FilterByDateTo
 		})
 	}
 
-	if filterByName != "" {
+	if args.FilterByName != "" {
 		activities = activities.Filter(func(a trainer.ActivityProvider) bool {
 			cloud := trainer.TagCloudFromActivities(trainer.ActivityList{a})
-			return cloud.Contains(filterByName)
+			return cloud.Contains(args.FilterByName)
 		})
 	}
 
@@ -64,7 +78,7 @@ func findActivities(lookupPath string) (activities trainer.ActivityList, err err
 
 	activities.SortByTime()
 
-	if logDebug {
+	if args.LogDebug {
 		for _, activity := range activities {
 			log.Printf("Activity: %s", activity.Metadata().Name)
 		}
@@ -94,44 +108,6 @@ func getPathsWithPrefix(root string, prefix string) (prefixedPaths []string, err
 	return
 }
 
-func getActivitiesFromPaths(paths []string) (list trainer.ActivityList) {
-	wg := new(sync.WaitGroup)
-	wg.Add(len(paths))
-
-	inputCh := make(chan string, len(paths))
-	for i := range paths {
-		inputCh <- paths[i]
-	}
-	close(inputCh)
-
-	activitiesCh := make(chan trainer.ActivityProvider, len(paths))
-
-	maxParallelOpen := 10
-	for w := 0; w < maxParallelOpen; w++ {
-		go loadActivityWorker(wg, inputCh, activitiesCh)
-	}
-	wg.Wait()
-	close(activitiesCh)
-
-	list = make(trainer.ActivityList, 0)
-	for activity := range activitiesCh {
-		list = append(list, activity)
-	}
-	return
-}
-
-func loadActivityWorker(wg *sync.WaitGroup, paths <-chan string, activities chan<- trainer.ActivityProvider) {
-	for path := range paths {
-		defer wg.Done()
-		provider, err := provider.File(path)
-		if err != nil {
-			log.Printf("cannot open file %q: %s\n", path, err)
-			continue
-		}
-		activities <- provider
-	}
-}
-
 func findPaths(root string) (filePaths []string, err error) {
 	files, err := ioutil.ReadDir(root)
 	if err != nil {
@@ -144,7 +120,7 @@ func findPaths(root string) (filePaths []string, err error) {
 	return
 }
 
-func applyStravaEnricher(activities trainer.ActivityList) (err error) {
+func applyStravaEnricher(activities trainer.ActivityList, stravaCsvEnrichPath string) (err error) {
 	stravaEnricher, err := enricher.StravaCsv(stravaCsvEnrichPath)
 	if err != nil {
 		return err

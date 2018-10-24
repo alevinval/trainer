@@ -26,6 +26,10 @@ func (ma *MockActivity) DataPoints() DataPointList {
 	return DataPointList{}
 }
 
+func (ma *MockActivity) Bytes() []byte {
+	return []byte("")
+}
+
 func createActivityListWithTimes(times ...time.Time) ActivityList {
 	list := ActivityList{}
 	for _, t := range times {

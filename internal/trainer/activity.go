@@ -14,12 +14,17 @@ type (
 		Metadata() *Metadata
 	}
 
+	BytesProvider interface {
+		Bytes() []byte
+	}
+
 	// ActivityProvider is the main domain object, it contains metadata about
 	// your activity and the normalised datapoints with processed information
 	// such as speed, performance, etc...
 	ActivityProvider interface {
 		MetadataProvider
 		DataPointProvider
+		BytesProvider
 	}
 
 	// ActivityList is a list of activities.

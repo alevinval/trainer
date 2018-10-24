@@ -5,6 +5,7 @@ import "github.com/alevinval/trainer/internal/trainer"
 type MockActivity struct {
 	MockMetadata   *trainer.Metadata
 	MockDataPoints trainer.DataPointList
+	MockBytes      []byte
 }
 
 func (ma *MockActivity) Metadata() *trainer.Metadata {
@@ -19,4 +20,11 @@ func (ma *MockActivity) DataPoints() trainer.DataPointList {
 		return ma.MockDataPoints
 	}
 	return trainer.DataPointList{}
+}
+
+func (ma *MockActivity) Bytes() []byte {
+	if ma.MockBytes != nil {
+		return ma.MockBytes
+	}
+	return []byte("")
 }

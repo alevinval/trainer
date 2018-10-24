@@ -10,6 +10,7 @@ import (
 
 // fitAdapter maps a fit.File into trainer primitives.
 type fitAdapter struct {
+	b          []byte
 	metadata   *trainer.Metadata
 	datapoints trainer.DataPointList
 }
@@ -30,6 +31,7 @@ func Fit(b []byte) (provider trainer.ActivityProvider, err error) {
 	adapter := &fitAdapter{
 		metadata:   makeMetadata(activity),
 		datapoints: makeDatapoints(activity),
+		b:          b,
 	}
 	return adapter, err
 }
@@ -45,6 +47,12 @@ func (adapter *fitAdapter) DataPoints() (list trainer.DataPointList) {
 // The activity name and time it was carried on.
 func (adapter *fitAdapter) Metadata() (metadata *trainer.Metadata) {
 	return adapter.metadata
+}
+
+// Bytes implements trainer.BytesProvider interface.
+// Returns the raw bytes of the original activity.
+func (adapter *fitAdapter) Bytes() []byte {
+	return adapter.b
 }
 
 func makeMetadata(activity *fit.ActivityFile) (metadata *trainer.Metadata) {

@@ -16,6 +16,7 @@ type (
 
 		metadata   *trainer.Metadata
 		datapoints trainer.DataPointList
+		b          []byte
 	}
 
 	// gpxTrackPoint maps to a GPX file trackpoint
@@ -40,6 +41,7 @@ func Gpx(b []byte) (provider trainer.ActivityProvider, err error) {
 
 	g.metadata = g.makeMetadata()
 	g.datapoints = g.makeDataPoints()
+	g.b = b
 	return g, err
 }
 
@@ -50,10 +52,16 @@ func (g *gpxAdapter) Metadata() (meta *trainer.Metadata) {
 	return g.metadata
 }
 
-// DataPoints implements DatapointProvider interface.
+// DataPoints implements trainer.DatapointProvider interface.
 // It converts a list of gpxTrackPoints to a list of datapoints.
 func (g *gpxAdapter) DataPoints() (list trainer.DataPointList) {
 	return g.datapoints
+}
+
+// Bytes implements trainer.BytesProvider interface.
+// Returns the raw bytes of the original activity.
+func (g *gpxAdapter) Bytes() []byte {
+	return g.b
 }
 
 func (g *gpxAdapter) makeMetadata() (metadata *trainer.Metadata) {
