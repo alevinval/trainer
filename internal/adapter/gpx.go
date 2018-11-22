@@ -40,7 +40,6 @@ func Gpx(b []byte) (provider trainer.ActivityProvider, err error) {
 	}
 
 	g.metadata = g.makeMetadata()
-	g.datapoints = g.makeDataPoints()
 	g.b = b
 	return g, err
 }
@@ -55,6 +54,9 @@ func (g *gpxAdapter) Metadata() (meta *trainer.Metadata) {
 // DataPoints implements trainer.DatapointProvider interface.
 // It converts a list of gpxTrackPoints to a list of datapoints.
 func (g *gpxAdapter) DataPoints() (list trainer.DataPointList) {
+	if g.datapoints == nil {
+		g.datapoints = g.makeDataPoints()
+	}
 	return g.datapoints
 }
 

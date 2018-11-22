@@ -11,6 +11,7 @@ import (
 // fitAdapter maps a fit.File into trainer primitives.
 type fitAdapter struct {
 	b          []byte
+	activity   *fit.ActivityFile
 	metadata   *trainer.Metadata
 	datapoints trainer.DataPointList
 }
@@ -29,9 +30,9 @@ func Fit(b []byte) (provider trainer.ActivityProvider, err error) {
 	}
 
 	adapter := &fitAdapter{
-		metadata:   makeMetadata(activity),
-		datapoints: makeDatapoints(activity),
-		b:          b,
+		b:        b,
+		activity: activity,
+		metadata: makeMetadata(activity),
 	}
 	return adapter, err
 }
@@ -39,6 +40,9 @@ func Fit(b []byte) (provider trainer.ActivityProvider, err error) {
 // DataPoints implements trainer.DatapointProvider interface.
 // It converts a list of activity records to a list of datapoints.
 func (adapter *fitAdapter) DataPoints() (list trainer.DataPointList) {
+	if adapter.datapoints == nil {
+		adapter.datapoints = makeDatapoints(adapter.activity)
+	}
 	return adapter.datapoints
 }
 
