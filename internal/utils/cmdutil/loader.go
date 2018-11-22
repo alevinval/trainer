@@ -36,6 +36,10 @@ func LoadActivityFromArgs(args CmdArgs) (activities trainer.ActivityList, err er
 
 	activities = utils.ActivitiesFromPaths(paths)
 
+	if args.LogDebug {
+		log.Printf("Total %d activities", len(activities))
+	}
+
 	if args.StravaCsvEnrichPath != "" {
 		err = applyStravaEnricher(activities, args.StravaCsvEnrichPath)
 		if err != nil {
@@ -79,6 +83,7 @@ func LoadActivityFromArgs(args CmdArgs) (activities trainer.ActivityList, err er
 	activities.SortByTime()
 
 	if args.LogDebug {
+		log.Printf("Found %d activities after filtering", len(activities))
 		for _, activity := range activities {
 			log.Printf("Activity: %s", activity.Metadata().Name)
 		}
