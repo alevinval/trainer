@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/alevinval/trainer/internal/testutil"
@@ -42,11 +43,16 @@ func TestOpenFile(t *testing.T) {
 		{"right-file-2-compressed.gpx.gz", string(sampleGpx), nil, 3},
 		{"right-file-1.fit", string(sampleFit), nil, 260},
 		{"right-file-2-compressed.fit.gz", string(sampleFit), nil, 260},
+
+		{"upper-case-ext.GPX", string(sampleGpx), nil, 3},
+		{"upper-case-ext.GPX.GZ", string(sampleGpx), nil, 3},
+		{"upper-case-ext.FIT", string(sampleFit), nil, 260},
+		{"upper-case-ext.FIT.GZ", string(sampleFit), nil, 260},
 	} {
 		t.Run(fmt.Sprintf("Provide from file %s", tt.fileName), func(t *testing.T) {
 			data := []byte(tt.data)
 			var filePath string
-			if path.Ext(tt.fileName) == ".gz" {
+			if strings.ToLower(path.Ext(tt.fileName)) == ".gz" {
 				filePath = tmp.CreateGzip(tt.fileName, data)
 			} else {
 				filePath = tmp.Create(tt.fileName, data)

@@ -28,12 +28,12 @@ var (
 )
 
 // File reads a file content and returns an ActivityProvider
-func File(name string) (provider trainer.ActivityProvider, err error) {
-	ext, isGzip := isGzip(name)
+func File(filePath string) (provider trainer.ActivityProvider, err error) {
+	ext, isGzip := isGzip(filePath)
 	if !isExtSupported(ext) {
 		return nil, ErrExtensionNotSupported
 	}
-	r, err := getReaderForFile(name, isGzip)
+	r, err := getReaderForFile(filePath, isGzip)
 	if err != nil {
 		return nil, err
 	}
@@ -47,13 +47,14 @@ func File(name string) (provider trainer.ActivityProvider, err error) {
 	}
 	provider.Metadata().DataSource = trainer.DataSource{
 		Type: trainer.FileDataSource,
-		Name: name,
+		Name: filePath,
 	}
 	return provider, nil
 }
 
 // isGzip returns the extension of a file and whether its zipped or not.
 func isGzip(name string) (ext string, isGzip bool) {
+	name = strings.ToLower(name)
 	if strings.HasSuffix(name, ".gz") {
 		nameWithoutGz := strings.TrimSuffix(name, ".gz")
 		ext := path.Ext(nameWithoutGz)
